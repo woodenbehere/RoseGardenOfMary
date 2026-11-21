@@ -1,0 +1,1548 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<link rel="manifest" href="manifest.webmanifest">
+<meta name="theme-color" content="#23457d">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="Rose Garden">
+<link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
+<link rel="icon" type="image/png" sizes="192x192" href="icons/icon-192.png">
+<style>*{box-sizing:border-box}body{margin:0}[hidden]{display:none!important}:root{padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}</style>
+<title>Rose Garden of Mary</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;0,700;1,500&family=EB+Garamond:ital,wght@0,400;0,500;0,600;1,400&family=Jost:wght@400;500;600&display=swap">
+<style>
+/* Layout: one centered column on a phone (two columns on a wide or unfolded screen).
+   Two modes: the daily Rosary (today, stats, calendar) and the 54-Day Rosary Novena (54 roses).
+   Achievements sit below both; prayers open in a sheet. */
+:root{
+  --bg:#f5f1ea;            /* warm parchment */
+  --paper:#fffdf9;
+  --ink:#1f2433;
+  --muted:#656b7a;
+  --line:#e3dccf;
+  --marian:#23457d;        /* Marian blue */
+  --marian-soft:#e3e9f4;
+  --rose:#b8324f;
+  --rose-deep:#86203a;
+  --rose-light:#e57f93;
+  --rose-soft:#f5d7de;
+  --glow:rgba(214,70,100,.5);
+  --bud:#ece6da;
+  --bud-edge:#b3aa9a;
+  --sepal:#7d9a7c;
+  --gold:#c9a24a;
+  --gold-ink:#6f5418;
+  --gold-soft:#f4e9cb;
+  --shadow:0 1px 2px rgba(31,36,51,.06),0 8px 24px rgba(31,36,51,.07);
+  --note:#fbf0da; --note-ink:#6a5520;
+  --f-display:"Cormorant Garamond","EB Garamond",Garamond,Georgia,serif;
+  --f-body:"EB Garamond",Garamond,Georgia,"Times New Roman",serif;
+  --f-ui:"Jost","Avenir Next","Segoe UI",system-ui,sans-serif;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#0e1424; --paper:#161f33; --ink:#ece9e2; --muted:#a1a7b6; --line:#2a344c;
+  --marian:#93b2e8; --marian-soft:#1f2b45; --rose:#e05a74; --rose-deep:#a8304c; --rose-light:#f29cad; --rose-soft:#4a2433;
+  --glow:rgba(240,95,125,.55); --bud:#232c42; --bud-edge:#58637d; --sepal:#6f8f74;
+  --gold:#d7b462; --gold-ink:#2b2008; --gold-soft:#3a3018; --shadow:0 1px 2px rgba(0,0,0,.3),0 8px 24px rgba(0,0,0,.3);
+  --note:#2c2614; --note-ink:#e6d39c; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#0e1424; --paper:#161f33; --ink:#ece9e2; --muted:#a1a7b6; --line:#2a344c;
+  --marian:#93b2e8; --marian-soft:#1f2b45; --rose:#e05a74; --rose-deep:#a8304c; --rose-light:#f29cad; --rose-soft:#4a2433;
+  --glow:rgba(240,95,125,.55); --bud:#232c42; --bud-edge:#58637d; --sepal:#6f8f74;
+  --gold:#d7b462; --gold-ink:#2b2008; --gold-soft:#3a3018; --shadow:0 1px 2px rgba(0,0,0,.3),0 8px 24px rgba(0,0,0,.3);
+  --note:#2c2614; --note-ink:#e6d39c; color-scheme:dark}
+
+body{background:var(--bg);color:var(--ink);font-family:var(--f-body);font-size:17px;line-height:1.55}
+.wrap{max-width:560px;margin:0 auto;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:20px 48px;display:flex;flex-direction:column;gap:20px}
+.main{display:flex;flex-direction:column;gap:20px}
+.col{display:flex;flex-direction:column;gap:20px;min-width:0}
+@media (min-width:760px){
+  .wrap{max-width:1040px;padding-left:max(28px,env(safe-area-inset-left,0px));padding-right:max(28px,env(safe-area-inset-right,0px))}
+  .main{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:24px;align-items:start}
+}
+body[data-mode="daily"] .only-novena,body[data-mode="novena"] .only-daily{display:none!important}
+button{font:inherit;color:inherit;cursor:pointer}
+:focus-visible{outline:2px solid var(--marian);outline-offset:3px;border-radius:6px}
+
+header{display:flex;align-items:flex-start;justify-content:space-between;gap:12px}
+.eyebrow{font-family:var(--f-ui);font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:var(--rose);font-weight:500}
+h1{font-family:var(--f-display);font-weight:600;font-size:clamp(30px,8vw,42px);line-height:1.05;margin:4px 0 0;text-wrap:balance;color:var(--marian)}
+.theme-btn{flex:none;min-width:44px;height:44px;border-radius:22px;border:1px solid var(--line);background:var(--paper);font-family:var(--f-ui);font-size:13px;padding:0 14px;color:var(--muted)}
+.install-btn{display:inline-flex;align-items:center;gap:6px;color:var(--paper);background:var(--marian);border-color:var(--marian);font-weight:500;padding:0 14px}
+.lock-btn{padding:0;width:44px;display:grid;place-items:center;color:var(--marian)}
+.head-btns{display:flex;gap:8px;flex:none;flex-wrap:wrap;justify-content:flex-end}
+
+/* mode switch */
+.modes{display:grid;grid-template-columns:1fr 1fr;gap:4px;background:var(--paper);border:1px solid var(--line);border-radius:99px;padding:4px;box-shadow:var(--shadow)}
+.modes button{min-height:46px;border:none;border-radius:99px;background:none;font-family:var(--f-ui);font-size:15px;font-weight:500;color:var(--muted);transition:background .2s,color .2s}
+.modes button[aria-pressed="true"]{background:var(--marian);color:var(--paper)}
+
+.card{background:var(--paper);border-radius:16px;padding:16px 18px;box-shadow:var(--shadow);display:flex;flex-direction:column;gap:10px}
+.card h2{font-family:var(--f-display);font-weight:600;font-size:25px;margin:0;line-height:1.15}
+.label{font-family:var(--f-ui);font-size:11.5px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);font-weight:500}
+.intent-text{font-family:var(--f-display);font-size:22px;line-height:1.3;font-style:italic;margin:0;white-space:pre-wrap;overflow-wrap:anywhere}
+.intent-text.empty{color:var(--muted)}
+.intent-row{display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap}
+.meta{font-family:var(--f-ui);font-size:13px;color:var(--muted)}
+textarea{width:100%;box-sizing:border-box;min-height:96px;resize:vertical;border:1px solid var(--line);border-radius:10px;background:var(--bg);color:var(--ink);font-family:var(--f-body);font-size:17px;padding:10px 12px}
+.link-btn{background:none;border:none;color:var(--marian);font-family:var(--f-ui);font-size:14px;font-weight:500;padding:8px 2px;min-height:40px}
+.link-row{display:flex;flex-wrap:wrap;gap:0 18px;align-items:center}
+
+/* today card */
+.today-set{font-family:var(--f-display);font-weight:600;font-size:30px;line-height:1.1;margin:0;color:var(--marian)}
+.today-why{font-style:italic;color:var(--muted);margin:0;font-size:16px}
+.today-count{display:flex;align-items:center;gap:10px;flex-wrap:wrap;min-height:34px}
+.today-count .roses{display:flex;gap:3px;flex-wrap:wrap}
+.today-count .roses svg{width:28px;height:28px;overflow:visible}
+.today-count .roses .hp-o{fill:var(--rose);stroke:var(--rose-deep);stroke-width:1.4}
+.today-count .roses .hp-i{fill:var(--rose-light);stroke:var(--rose-deep);stroke-width:1.2}
+.today-count .roses .hp-c{fill:none;stroke:var(--rose-deep);stroke-width:1.6;stroke-linecap:round}
+.today-count .roses .empty .hp-o,.today-count .roses .empty .hp-i{fill:transparent;stroke:var(--bud-edge)}
+.today-count .roses .empty .hp-c{stroke:var(--bud-edge)}
+.count-text{font-family:var(--f-ui);font-size:15px;font-weight:500}
+
+.note{background:var(--note);color:var(--note-ink);border-radius:12px;padding:12px 14px;font-size:16px}
+.actions{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.btn{min-height:54px;border-radius:14px;border:1px solid var(--line);background:var(--paper);font-family:var(--f-ui);font-size:15px;font-weight:500;padding:10px 14px;line-height:1.25}
+.btn.primary{background:var(--marian);border-color:var(--marian);color:var(--paper)}
+.btn.rose{background:var(--rose);border-color:var(--rose);color:#fff}
+.btn.gold{background:var(--gold);border-color:var(--gold);color:var(--gold-ink)}
+.sync{font-family:var(--f-ui);font-size:12px;color:var(--muted);text-align:center}
+
+/* stats */
+.stats{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}
+.stat{background:var(--bg);border-radius:12px;padding:10px 8px;text-align:center;display:flex;flex-direction:column;justify-content:center;min-height:82px}
+.stat b{font-family:var(--f-display);font-weight:700;font-size:30px;line-height:1;color:var(--marian)}
+.stat span{font-family:var(--f-ui);font-size:12px;color:var(--muted);margin-top:4px;line-height:1.25}
+.stat.hl b{color:var(--rose)}
+.sets{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:6px}
+.sets div{border:1px solid var(--line);border-radius:12px;padding:8px 4px;text-align:center}
+.sets b{display:block;font-family:var(--f-display);font-weight:700;font-size:24px;line-height:1.05}
+.sets span{font-family:var(--f-ui);font-size:11.5px;color:var(--muted)}
+
+/* calendar */
+.cal-head{display:flex;align-items:center;justify-content:space-between;gap:8px}
+.cal-head h2{text-align:center;flex:1}
+.cal-nav{width:44px;height:44px;border-radius:22px;border:1px solid var(--line);background:var(--bg);font-family:var(--f-ui);font-size:20px;line-height:1;color:var(--marian)}
+.cal-nav:disabled{opacity:.3;cursor:default}
+.cal-grid{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:4px}
+.cal-wd{font-family:var(--f-ui);font-size:11.5px;color:var(--muted);text-align:center;padding:2px 0;letter-spacing:.04em}
+.cal-d{position:relative;aspect-ratio:1;min-height:38px;border:none;border-radius:50%;background:none;font-family:var(--f-ui);font-size:14px;font-weight:500;color:var(--ink);display:grid;place-items:center;padding:0;-webkit-tap-highlight-color:transparent}
+.cal-d.p1{background:var(--rose-soft);color:var(--rose-deep)}
+.cal-d.p2{background:var(--rose);color:#fff}
+.cal-d.today{box-shadow:inset 0 0 0 2px var(--marian)}
+.cal-d.future{color:var(--muted);opacity:.45;cursor:default}
+.cal-d .st{position:absolute;top:-2px;right:-1px;width:13px;height:13px}
+.cal-legend{display:flex;flex-wrap:wrap;gap:6px 14px;align-items:center;font-family:var(--f-ui);font-size:12px;color:var(--muted)}
+.cal-legend i{display:inline-block;width:12px;height:12px;border-radius:50%;vertical-align:-1px;margin-right:4px}
+:root[data-theme="dark"] .cal-d.p1{color:var(--rose-light)}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]) .cal-d.p1{color:var(--rose-light)}}
+
+/* achievements */
+.badges{display:grid;grid-template-columns:repeat(auto-fill,minmax(98px,1fr));gap:12px 8px}
+.badge{border:none;background:none;padding:4px 2px;display:flex;flex-direction:column;align-items:center;gap:4px;text-align:center;-webkit-tap-highlight-color:transparent}
+.badge svg{width:68px;height:68px;overflow:visible}
+.badge .b-name{font-family:var(--f-display);font-weight:600;font-size:16px;line-height:1.15}
+.badge .b-sub{font-family:var(--f-ui);font-size:11.5px;color:var(--muted);line-height:1.3}
+.badge.locked .b-name{color:var(--muted)}
+.medal .m-bg{fill:var(--gold)}
+.medal .m-ring{fill:none;stroke:var(--gold-ink);stroke-opacity:.5;stroke-width:1.2}
+.medal .m-ink{fill:#6f5418}
+.medal .m-inks{fill:none;stroke:#6f5418;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.medal .m-txt{fill:#6f5418;font-family:var(--f-display);font-weight:700;text-anchor:middle}
+.medal .m-rose{fill:#b8324f;stroke:#86203a;stroke-width:.8}
+.medal .m-rosei{fill:#e57f93;stroke:#86203a;stroke-width:.6}
+.medal .m-leaf{fill:#5f7f5e}
+.medal.locked .m-bg{fill:var(--bud)}
+.medal.locked .m-ring{stroke:var(--bud-edge);stroke-opacity:1}
+.medal.locked .m-ink,.medal.locked .m-txt,.medal.locked .m-leaf{fill:var(--bud-edge)}
+.medal.locked .m-inks{stroke:var(--bud-edge)}
+.medal.locked .m-rose,.medal.locked .m-rosei{fill:var(--bud);stroke:var(--bud-edge)}
+.medal .m-lock{fill:var(--muted)}
+.medal .m-lock-s{fill:none;stroke:var(--muted);stroke-width:2.4}
+.badge-big svg{width:132px;height:132px;overflow:visible;display:block;margin:6px auto 4px;animation:medalin .8s cubic-bezier(.2,.9,.25,1.3)}
+@keyframes medalin{0%{transform:scale(.3) rotate(-25deg);opacity:0}100%{transform:none;opacity:1}}
+
+/* 54-day novena tracker */
+.nov-half{display:flex;flex-direction:column;gap:6px}
+.nov-half + .nov-half{margin-top:8px}
+.nov-grid{display:grid;grid-template-columns:repeat(9,minmax(0,1fr));gap:2px}
+.nb{position:relative;border:none;background:none;padding:2px 0 0;display:flex;flex-direction:column;align-items:center;gap:0;min-height:48px;-webkit-tap-highlight-color:transparent}
+.nb svg{width:100%;max-width:38px;aspect-ratio:1;overflow:visible}
+.nb .hp-o,.nb .hp-i{fill:transparent;stroke:var(--bud-edge);stroke-width:1.8;transition:fill .35s,stroke .35s}
+.nb .hp-c{fill:none;stroke:var(--bud-edge);stroke-width:1.8;stroke-linecap:round}
+.nb.on .hp-o{fill:var(--rose);stroke:var(--rose-deep)}
+.nb.on .hp-i{fill:var(--rose-light);stroke:var(--rose-deep)}
+.nb.on .hp-c{stroke:var(--rose-deep)}
+.nb.on.gold .hp-o{fill:var(--gold);stroke:var(--rose-light);stroke-width:3}
+.nb.on.gold .hp-i{fill:#e8cc84;stroke:var(--rose-light);stroke-width:2.6}
+.nb.on.gold .hp-c{stroke:var(--rose-light)}
+.nb.on svg{filter:drop-shadow(0 0 3px var(--glow))}
+.nb.next svg{animation:nbpulse 2.4s ease-in-out infinite}
+.nb.next .hp-o{stroke:var(--marian);stroke-width:2.4}
+@keyframes nbpulse{0%,100%{opacity:.55}50%{opacity:1}}
+.nb .nn{font-family:var(--f-ui);font-size:11px;color:var(--muted);line-height:1.2}
+.nb.next .nn{color:var(--marian);font-weight:600}
+.nb .st{position:absolute;top:0;right:2px;width:12px;height:12px}
+.nov-status{font-family:var(--f-display);font-size:24px;font-weight:600;line-height:1.2;margin:0}
+.nov-key{display:flex;flex-wrap:wrap;gap:4px 12px;font-family:var(--f-ui);font-size:12px;color:var(--muted)}
+.hist-list{list-style:none;margin:0;padding:0;display:flex;flex-direction:column}
+.hist-item{display:flex;gap:12px;align-items:center;padding:14px 2px;border-top:1px solid var(--line)}
+.hist-item:last-child{border-bottom:1px solid var(--line)}
+.hist-body{flex:1;min-width:0}
+.hist-intent{font-family:var(--f-display);font-size:19px;font-style:italic;line-height:1.25;overflow-wrap:anywhere;margin:0}
+.bar{height:6px;border-radius:3px;background:var(--bud);overflow:hidden;margin:6px 0 2px}
+.bar i{display:block;height:100%;background:var(--rose);border-radius:3px}
+.chip{display:inline-block;font-family:var(--f-ui);font-size:11px;letter-spacing:.08em;text-transform:uppercase;padding:2px 8px;border-radius:99px;background:var(--marian-soft);color:var(--marian);margin-right:6px}
+.chip.done{background:var(--rose);color:#fff}
+.empty-hist{color:var(--muted);font-style:italic;font-size:16px}
+
+/* overlays */
+.overlay{position:fixed;inset:0;background:rgba(10,15,25,.45);z-index:20;display:flex;align-items:flex-end;justify-content:center}
+.sheet{background:var(--paper);color:var(--ink);width:100%;max-width:720px;max-height:92%;overflow:auto;border-radius:20px 20px 0 0;box-sizing:border-box;padding:18px max(18px,env(safe-area-inset-right,0px)) calc(24px + env(safe-area-inset-bottom,0px)) max(18px,env(safe-area-inset-left,0px));box-shadow:0 -10px 40px rgba(0,0,0,.2);overscroll-behavior:contain}
+.sheet h3{font-family:var(--f-display);font-weight:600;font-size:26px;margin:0;line-height:1.15}
+.sheet-head{display:flex;justify-content:space-between;align-items:center;gap:10px;position:sticky;top:-18px;background:var(--paper);padding:6px 0 10px;z-index:1}
+.close{width:44px;height:44px;border-radius:22px;border:1px solid var(--line);background:var(--bg);font-size:22px;line-height:1;flex:none}
+.daychips{display:flex;gap:6px;overflow-x:auto;padding:4px 0 12px;scroll-padding:0 40%}
+.daychips button{flex:none;width:44px;height:44px;border-radius:22px;border:1px solid var(--line);background:var(--bg);font-family:var(--f-ui);font-weight:500}
+.daychips button.sel{background:var(--marian);color:var(--paper);border-color:var(--marian)}
+.daychips button.dn{box-shadow:inset 0 -3px 0 var(--rose)}
+.pray-intent{background:var(--marian-soft);border-radius:12px;padding:12px 14px;margin-bottom:12px}
+.pray-intent p{margin:4px 0 0;font-family:var(--f-display);font-style:italic;font-size:19px;line-height:1.3;white-space:pre-wrap;overflow-wrap:anywhere}
+details{border-top:1px solid var(--line)}
+details:last-of-type{border-bottom:1px solid var(--line)}
+summary{list-style:none;display:flex;align-items:center;gap:12px;min-height:56px;cursor:pointer;font-family:var(--f-display);font-size:21px;font-weight:600}
+summary::-webkit-details-marker{display:none}
+summary .n{flex:none;width:28px;height:28px;border-radius:14px;border:1px solid var(--gold);color:var(--gold-ink);background:var(--gold);font-family:var(--f-ui);font-size:13px;display:grid;place-items:center}
+summary::after{content:"+";margin-left:auto;font-family:var(--f-ui);font-size:22px;color:var(--muted)}
+details[open] > summary::after{content:"–"}
+.prayer{font-size:18.5px;line-height:1.7;max-width:62ch;padding:0 2px 18px}
+.prayer p{margin:0 0 .8em}
+.prayer .rub{font-family:var(--f-ui);font-size:13px;color:var(--muted);letter-spacing:.02em;line-height:1.55}
+.prayer ol{padding-left:22px;margin:0 0 .8em}
+.prayer h4{font-family:var(--f-ui);font-size:12px;letter-spacing:.12em;text-transform:uppercase;color:var(--marian);margin:14px 0 4px;font-weight:600}
+.dialog{border-radius:20px;margin:0 auto}
+.dialog .row{display:flex;gap:10px;margin-top:14px}
+.dialog .row .btn{flex:1}
+.popup-day{font-family:var(--f-display);font-size:25px;font-weight:600;line-height:1.2}
+.check{display:flex;align-items:center;gap:10px;min-height:48px;font-family:var(--f-ui);font-size:15px}
+.check input{width:22px;height:22px;accent-color:var(--marian)}
+.r-list{list-style:none;margin:10px 0 0;padding:0}
+.r-list li{display:flex;align-items:center;justify-content:space-between;gap:10px;border-top:1px solid var(--line);padding:8px 0}
+.r-list li:last-child{border-bottom:1px solid var(--line)}
+.r-list .r-main{font-family:var(--f-body);font-size:17px;line-height:1.3}
+.r-list .r-sub{font-family:var(--f-ui);font-size:12.5px;color:var(--muted)}
+.done-box{margin:8px 0 14px;background:var(--gold-soft);border-radius:12px;padding:12px 14px;display:flex;flex-direction:column;gap:8px;align-items:flex-start}
+.done-box p{margin:0;font-family:var(--f-display);font-weight:600;font-size:21px;color:var(--gold-ink)}
+:root[data-theme="dark"] .done-box p{color:var(--gold)}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]) .done-box p{color:var(--gold)}}
+.done-box .btn{min-height:46px}
+.nov-info{background:var(--gold-soft);border-radius:12px;padding:10px 14px;margin-bottom:14px;font-family:var(--f-ui);font-size:14px;line-height:1.45}
+.nov-info b{font-family:var(--f-display);font-size:20px;font-weight:600;display:block}
+
+.petal-fall{position:fixed;top:-30px;width:14px;height:18px;border-radius:70% 0 70% 0;background:var(--rose);opacity:.9;z-index:140;pointer-events:none;animation:fall linear forwards}
+@keyframes fall{to{transform:translate(var(--dx),110vh) rotate(var(--rot));opacity:.2}}
+.toast{position:fixed;left:50%;bottom:calc(24px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);background:var(--ink);color:var(--bg);font-family:var(--f-ui);font-size:14px;padding:10px 16px;border-radius:99px;z-index:150;max-width:calc(100% - 32px);text-align:center}
+.head-left{display:flex;align-items:center;flex-wrap:wrap;gap:8px 12px;min-width:0}
+.head-right{display:flex;align-items:center;gap:8px;flex:none}
+.fs-ctl{display:inline-flex;align-items:center;border:1px solid var(--line);border-radius:99px;background:var(--bg);padding:3px;gap:2px}
+.fs-ctl button{width:38px;height:36px;border:none;border-radius:99px;background:none;color:var(--ink);font-family:var(--f-display);font-weight:600;line-height:1;display:grid;place-items:center}
+.fs-ctl button:active{background:var(--marian-soft)}
+.fs-ctl button:disabled{opacity:.35;cursor:default}
+.fs-a{font-size:16px}.fs-A{font-size:24px}
+/* prayer text size, set by the a / A buttons */
+#prayBody{--ps:1}
+#prayBody .prayer{font-size:calc(18.5px*var(--ps))}
+#prayBody .prayer .rub{font-size:calc(13px*var(--ps))}
+#prayBody .prayer h4{font-size:calc(12px*var(--ps))}
+#prayBody > details > summary{font-size:calc(21px*var(--ps))}
+#prayBody details.myst > summary{font-size:calc(18.5px*var(--ps))}
+#prayBody .verses{font-size:calc(17px*var(--ps))}
+#prayBody .pray-intent p{font-size:calc(19px*var(--ps))}
+.lang-btn{display:inline-flex;align-items:center;gap:2px;min-height:40px;border:1px solid var(--line);border-radius:99px;padding:3px;background:var(--bg)}
+.lang-btn span{font-family:var(--f-ui);font-size:13px;font-weight:600;letter-spacing:.04em;padding:6px 11px;border-radius:99px;color:var(--muted);transition:background .2s,color .2s}
+.lang-btn[data-lang="en"] span[data-l="en"],.lang-btn[data-lang="la"] span[data-l="la"]{background:var(--marian);color:var(--paper)}
+.myst-pick{display:flex;flex-direction:column;gap:6px;margin-bottom:14px}
+select{appearance:none;-webkit-appearance:none;width:100%;min-height:48px;border:1px solid var(--line);border-radius:12px;background:var(--bg) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' fill='none' stroke='%238f9ab0' stroke-width='2'/%3E%3C/svg%3E") no-repeat right 14px center;color:var(--ink);font-family:var(--f-ui);font-size:16px;padding:10px 40px 10px 14px}
+/* scriptural rosary verses under each mystery */
+details.myst,details.myst:last-of-type{border:none}
+details.myst > summary{min-height:44px;font-family:var(--f-body);font-size:18.5px;font-weight:400;align-items:center;gap:10px}
+details.myst > summary::after{font-size:22px}
+.verses{margin:8px 0 4px;padding-left:22px;font-size:17px;line-height:1.6}
+.verses li{margin-bottom:6px}
+.verses .ref{font-family:var(--f-ui);font-size:12px;color:var(--muted);white-space:nowrap}
+/* PIN lock */
+body.locked .wrap,body.locked .overlay{filter:blur(18px);pointer-events:none;user-select:none}
+.lock{position:fixed;inset:0;z-index:100;display:flex;align-items:center;justify-content:center;background:rgba(120,135,160,.35);background:color-mix(in srgb,var(--bg) 55%,transparent);-webkit-backdrop-filter:blur(6px);backdrop-filter:blur(6px);padding:max(16px,env(safe-area-inset-top,0px)) max(16px,env(safe-area-inset-right,0px)) max(16px,env(safe-area-inset-bottom,0px)) max(16px,env(safe-area-inset-left,0px))}
+.lock-card{background:var(--paper);border-radius:24px;box-shadow:0 20px 60px rgba(10,15,25,.28);width:100%;max-width:340px;padding:26px 22px 18px;text-align:center;display:flex;flex-direction:column;align-items:center;gap:6px}
+.lock-medal{width:56px;height:56px;display:block}
+.lock-card h2{font-family:var(--f-display);font-weight:600;font-size:26px;margin:8px 0 0}
+.noscript-note{font-family:var(--f-ui);font-size:14px;line-height:1.45;color:var(--rose);background:var(--note);border-radius:10px;padding:10px 12px;margin:6px 0 0}
+.lock-msg{font-family:var(--f-ui);font-size:14px;color:var(--muted);min-height:20px;margin:0}
+.lock-msg.err{color:var(--rose)}
+.dots{display:flex;gap:16px;margin:14px 0 18px}
+.dots i{width:16px;height:16px;border-radius:50%;border:2px solid var(--marian);box-sizing:border-box;transition:background .15s}
+.dots i.on{background:var(--marian)}
+.dots.shake{animation:shake .4s}
+@keyframes shake{20%,60%{transform:translateX(-9px)}40%,80%{transform:translateX(9px)}}
+.keypad{display:grid;grid-template-columns:repeat(3,72px);gap:12px;justify-content:center}
+.keypad button{width:72px;height:72px;border-radius:50%;border:1px solid var(--line);background:var(--bg);font-family:var(--f-ui);font-size:26px;font-weight:500}
+.keypad button:active{background:var(--marian-soft)}
+.keypad .ghost{border:none;background:none;font-size:15px;color:var(--muted)}
+.lock-foot{display:flex;gap:16px;justify-content:center;margin-top:8px;min-height:40px}
+@media (max-height:600px){.keypad{grid-template-columns:repeat(3,60px);gap:8px}.keypad button{width:60px;height:60px;font-size:22px}.lock-card{padding:16px}}
+.site-foot{display:flex;flex-wrap:wrap;justify-content:center;align-items:center;gap:2px 5px;text-align:center;font-family:var(--f-ui);font-size:12px;letter-spacing:0;color:var(--muted);padding-top:12px;border-top:1px solid var(--line)}
+.install-steps{margin:0;padding-left:0;list-style:none;display:flex;flex-direction:column;gap:12px;counter-reset:st}
+.install-steps li{display:flex;gap:12px;align-items:flex-start;font-size:17px;line-height:1.5;counter-increment:st}
+.install-steps li::before{content:counter(st);flex:none;width:28px;height:28px;border-radius:14px;background:var(--gold);color:var(--gold-ink);font-family:var(--f-ui);font-size:13px;font-weight:600;display:grid;place-items:center;margin-top:1px}
+.install-steps svg{vertical-align:-3px;color:var(--marian)}
+.j-head{font-family:var(--f-ui);font-size:11.5px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);font-weight:500;margin:14px 0 2px}
+.j-list{list-style:none;margin:0;padding:0}
+.j-item{border-top:1px solid var(--line);padding:12px 0;display:flex;flex-direction:column;gap:4px}
+.j-text{font-family:var(--f-display);font-size:19px;font-style:italic;line-height:1.3;margin:0;white-space:pre-wrap;overflow-wrap:anywhere}
+.j-item.done .j-text{color:var(--muted)}
+.j-actions{display:flex;flex-wrap:wrap;gap:0 16px}
+.j-actions .link-btn{min-height:36px;padding:4px 0}
+.j-empty{color:var(--muted);font-style:italic;font-size:16px;margin:6px 0}
+.pick-chips{display:flex;flex-wrap:wrap;gap:8px;margin-top:6px}
+.pick-chips button{border:1px solid var(--line);background:var(--bg);border-radius:16px;padding:8px 12px;font-family:var(--f-body);font-style:italic;font-size:16px;line-height:1.3;max-width:100%;text-align:left;overflow-wrap:anywhere;color:var(--ink)}
+.pick-chips button.sel{border-color:var(--marian);background:var(--marian-soft)}
+@media (max-width:430px){.install-btn span{display:none}.install-btn{padding:0;width:44px;justify-content:center}}
+@media (max-width:360px){.head-btns{gap:6px}.head-btns .theme-btn{min-width:40px;height:40px}.head-btns .lock-btn{width:40px}.stats{gap:6px}.stat b{font-size:26px}}
+.refl-star{fill:var(--gold);stroke:var(--gold-ink);stroke-width:1;stroke-linejoin:round}
+.refl-preview{margin-top:12px;background:var(--bg);border-radius:12px;padding:10px 14px;max-height:180px;overflow:auto}
+.refl-preview .label{display:inline-flex;align-items:center;gap:6px}
+.refl-preview p{margin:4px 0 0;font-family:var(--f-display);font-style:italic;font-size:18px;line-height:1.35;white-space:pre-wrap;overflow-wrap:anywhere}
+textarea.notepad{min-height:224px;line-height:32px;padding:4px 12px;margin-top:6px;background-color:var(--paper);background-image:repeating-linear-gradient(to bottom,transparent 0,transparent 31px,var(--line) 31px,var(--line) 32px);background-position:0 4px;background-attachment:local}
+.hm-row{display:flex;gap:2px;margin:6px 0 10px;max-width:600px}
+.hm-rose.gap{margin-left:5px}
+.hm-rose{flex:1 1 0;min-width:0;aspect-ratio:1;max-width:40px;padding:1px;border:none;background:none;cursor:pointer;-webkit-tap-highlight-color:transparent}
+.hm-rose svg{display:block;width:100%;height:100%;overflow:visible}
+.hm-rose .hp-o,.hm-rose .hp-i{fill:transparent;stroke:var(--bud-edge);stroke-width:1.6;transition:fill .35s,stroke .35s}
+.hm-rose .hp-c{fill:none;stroke:var(--bud-edge);stroke-width:1.6;stroke-linecap:round}
+.hm-rose.on .hp-o{fill:var(--rose);stroke:var(--rose-deep)}
+.hm-rose.on .hp-i{fill:var(--rose-light);stroke:var(--rose-deep)}
+.hm-rose.on .hp-c{stroke:var(--rose-deep)}
+.hm-rose.gold .hp-o{fill:var(--gold);stroke:var(--rose-light);stroke-width:3}
+.hm-rose.gold .hp-i{fill:#e8cc84;stroke:var(--rose-light);stroke-width:2.6}
+.hm-rose.gold .hp-c{stroke:var(--rose-light)}
+.hm-rose.on svg{filter:drop-shadow(0 0 3px var(--glow))}
+.hm-rose.pop svg{animation:hmpop .45s cubic-bezier(.2,.9,.25,1.3)}
+@keyframes hmpop{0%{transform:scale(.5) rotate(-30deg)}100%{transform:scale(1) rotate(0)}}
+/* prayers written in lines (St. Joseph): centered, each line kept whole where it fits and wrapped evenly where it doesn’t */
+.prayer p.lines{text-align:center}
+.prayer p.lines span{display:block;text-wrap:balance}
+.intent-insert{color:var(--marian);font-style:italic}
+.site-foot a{color:var(--marian);text-decoration:none;font-weight:500}
+.site-foot a:hover{text-decoration:underline}
+.site-foot .mail-link{display:inline-grid;place-items:center;min-width:24px;min-height:32px}
+@media (prefers-reduced-motion: reduce){*{animation:none!important;transition:none!important}}
+</style>
+
+</head>
+<body class="locked" data-mode="daily">
+<div class="wrap">
+  <header>
+    <div>
+      <div class="eyebrow">The Holy Rosary</div>
+      <h1>Rose Garden of Mary</h1>
+    </div>
+    <div class="head-btns">
+      <button class="theme-btn install-btn" id="installBtn" hidden aria-label="Install this app on your home screen">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3v12"/><path d="M7 10l5 5 5-5"/><path d="M4 19h16"/></svg><span>Install</span>
+      </button>
+      <button class="theme-btn lock-btn" id="lockNowBtn" aria-label="Lock the page" title="Lock">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4" y="10.5" width="16" height="11" rx="2.5"/><path d="M8 10.5V7a4 4 0 0 1 8 0v3.5"/><circle cx="12" cy="16" r="1.4" fill="currentColor" stroke="none"/></svg>
+      </button>
+      <button class="theme-btn lock-btn" id="journalBtn" aria-label="Open intentions journal" title="Intentions journal">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="5" y="4" width="14" height="17" rx="2"/><path d="M9 2.5v3M15 2.5v3M9 11h6M9 15h4"/></svg>
+      </button>
+      <button class="theme-btn" id="themeBtn" aria-label="Change light or dark mode">Auto</button>
+    </div>
+  </header>
+
+  <div class="modes" role="group" aria-label="Choose what to pray">
+    <button id="modeDaily" aria-pressed="true">Daily Rosary</button>
+    <button id="modeNovena" aria-pressed="false">54-Day Novena</button>
+  </div>
+
+  <div class="main">
+    <div class="col">
+      <!-- daily Rosary -->
+      <section class="card only-daily" id="todayCard" aria-live="polite"></section>
+      <section class="card only-daily" id="intentCard"></section>
+      <div class="note only-daily" id="dailyNote" hidden></div>
+      <section class="card only-daily" id="statsCard">
+        <h2>Your Rosaries</h2>
+        <div class="stats" id="stats"></div>
+        <div class="label" style="margin-top:4px">Mysteries prayed</div>
+        <div class="sets" id="setCounts"></div>
+      </section>
+
+      <!-- 54-Day Rosary Novena -->
+      <section class="card only-novena" id="novCard" aria-live="polite"></section>
+      <section class="card only-novena" id="novTrackCard">
+        <div id="novTrack" role="group" aria-label="Fifty-four roses, one for each day of the novena"></div>
+      </section>
+      <div class="note only-novena" id="novNote" hidden></div>
+      <div class="actions only-novena">
+        <button class="btn primary" id="novPrayBtn">Today’s Novena Rosary</button>
+        <button class="btn" id="novNewBtn">Start New 54-Day Novena</button>
+      </div>
+    </div>
+
+    <div class="col">
+      <section class="card only-daily" id="calCard"></section>
+      <section class="card only-novena">
+        <h2>Your 54-Day Novenas</h2>
+        <ul class="hist-list" id="novHist"></ul>
+      </section>
+      <section class="card" id="badgeCard">
+        <div class="intent-row"><h2>Achievements</h2><span class="meta" id="badgeCount"></span></div>
+        <div class="badges" id="badges"></div>
+      </section>
+    </div>
+  </div>
+
+  <div class="sync">Your history is saved on this phone.
+    <div style="display:flex;flex-wrap:wrap;column-gap:16px;justify-content:center;margin-top:4px">
+      <button class="link-btn" id="exportBtn">Save a backup</button>
+      <button class="link-btn" id="importBtn">Restore a backup</button>
+      <button class="link-btn" id="changePinBtn">Change PIN</button>
+      <button class="link-btn" id="clearHistBtn" style="color:var(--rose)">Clear history</button>
+      <input type="file" id="importFile" accept=".json,application/json" hidden>
+    </div></div>
+
+  <footer class="site-foot">
+    <span>Jacoby / Parden Web Apps 2026</span><span class="sep">-</span><span id="appVersion">v1</span><span class="sep">-</span><a href="https://venmo.com/James-Parden" target="_blank" rel="noopener">Donate</a><span class="sep">-</span><a href="mailto:jdparden@gmail.com?subject=Rose%20Garden%20of%20Mary" class="mail-link" aria-label="Email jdparden@gmail.com" title="Email jdparden@gmail.com"><svg width="18" height="14" viewBox="0 0 24 18" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round" stroke-linecap="round" aria-hidden="true"><rect x="1.5" y="1.5" width="21" height="15" rx="2.5"/><path d="M2.5 3l9.5 7 9.5-7"/></svg></a>
+  </footer>
+</div>
+
+<div class="lock" id="lockScreen" role="dialog" aria-modal="true" aria-labelledby="lockTitle">
+  <div class="lock-card">
+    <svg class="lock-medal" viewBox="0 0 64 64" aria-hidden="true"><rect width="64" height="64" rx="16" fill="#86203a"/><path d="M15,27 L19,13 L26,22 L32,9 L38,22 L45,13 L49,27Z" fill="#c9a24a" stroke="#f0d99a" stroke-width="1"/><rect x="15" y="27" width="34" height="4.5" rx="1.5" fill="#c9a24a"/><path d="M18,54 V36 L32,49 L46,36 V54" fill="none" stroke="#f7f1e6" stroke-width="4.6" stroke-linejoin="round" stroke-linecap="round"/></svg>
+    <h2 id="lockTitle">Enter your PIN</h2>
+    <p class="noscript-note" id="noJsNote">This preview can’t run the Rosary tracker. On an iPhone, open it from a web address in Safari instead of from Files, Messages or Mail.</p>
+    <p class="lock-msg" id="lockMsg" aria-live="polite"></p>
+    <div class="dots" id="pinDots" aria-hidden="true"><i></i><i></i><i></i><i></i></div>
+    <div class="keypad" id="keypad">
+      <button data-k="1">1</button><button data-k="2">2</button><button data-k="3">3</button>
+      <button data-k="4">4</button><button data-k="5">5</button><button data-k="6">6</button>
+      <button data-k="7">7</button><button data-k="8">8</button><button data-k="9">9</button>
+      <button class="ghost" id="lockCancel" style="visibility:hidden">Cancel</button><button data-k="0">0</button><button class="ghost" data-k="del" aria-label="Delete last digit">⌫</button>
+    </div>
+    <div class="lock-foot" id="lockFoot"><button class="link-btn" id="forgotBtn" hidden>Forgot PIN?</button></div>
+  </div>
+</div>
+
+<div class="overlay" id="prayOverlay" hidden>
+  <div class="sheet" role="dialog" aria-modal="true" aria-labelledby="prayTitle">
+    <div class="sheet-head"><div class="head-left"><h3 id="prayTitle">The Holy Rosary</h3><button class="lang-btn" id="langBtn" data-lang="en" aria-label="Show prayers in Latin"><span data-l="en">English</span><span data-l="la">Latin</span></button></div><div class="head-right"><div class="fs-ctl" role="group" aria-label="Text size"><button id="fsDown" aria-label="Smaller prayer text"><span class="fs-a">a</span></button><button id="fsUp" aria-label="Larger prayer text"><span class="fs-A">A</span></button></div><button class="close" id="prayClose" aria-label="Close prayers">×</button></div></div>
+    <div class="daychips" id="dayChips" role="tablist" aria-label="Choose a day of the novena" hidden></div>
+    <div id="prayBody"></div>
+  </div>
+</div>
+
+<div class="overlay" id="markOverlay" hidden>
+  <div class="sheet dialog" role="dialog" aria-modal="true" aria-labelledby="markTitle">
+    <h3 id="markTitle">Mark a Rosary prayed</h3>
+    <p class="meta" id="markMeta" style="margin:6px 0 12px"></p>
+    <label class="label" for="markSet">Mysteries prayed</label>
+    <select id="markSet" style="margin-top:6px"></select>
+    <label class="check"><input type="checkbox" id="markLatin"> Prayed in Latin</label>
+    <div class="row"><button class="btn" id="markCancel">Cancel</button><button class="btn gold" id="markGo">Mark prayed</button></div>
+  </div>
+</div>
+
+<div class="overlay" id="confirmOverlay" hidden>
+  <div class="sheet dialog" role="alertdialog" aria-modal="true" aria-labelledby="confirmTitle">
+    <h3 id="confirmTitle">Are you sure?</h3>
+    <p id="confirmText" style="margin:8px 0 0"></p>
+    <div class="row"><button class="btn" id="confirmNo">Keep it</button><button class="btn rose" id="confirmYes">Unmark</button></div>
+  </div>
+</div>
+
+<div class="overlay" id="calDayOverlay" hidden>
+  <div class="sheet dialog" role="dialog" aria-modal="true" aria-labelledby="calDayTitle">
+    <div class="sheet-head" style="top:0;padding-top:0"><div class="popup-day" id="calDayTitle">Today</div><button class="close" id="calDayClose" aria-label="Close">×</button></div>
+    <p class="meta" id="calDayMeta" style="margin:0"></p>
+    <ul class="r-list" id="calDayList"></ul>
+    <div class="refl-preview" id="calDayRefl" hidden><span class="label"><svg width="13" height="13" viewBox="-8 -8 16 16" aria-hidden="true"><polygon class="refl-star" points="0.00,-7.50 1.88,-2.59 7.13,-2.32 3.04,0.99 4.41,6.07 0.00,3.20 -4.41,6.07 -3.04,0.99 -7.13,-2.32 -1.88,-2.59"/></svg> Your reflection</span><p id="calDayReflText"></p></div>
+    <div class="row"><button class="btn gold" id="calDayReflBtn">Add reflection</button></div>
+    <div class="row" style="margin-top:8px"><button class="btn" id="calDayAdd">I prayed a Rosary this day</button></div>
+  </div>
+</div>
+
+<div class="overlay" id="newOverlay" hidden>
+  <div class="sheet dialog" role="dialog" aria-modal="true" aria-labelledby="newTitle">
+    <h3 id="newTitle">Begin a 54-Day Rosary Novena</h3>
+    <p class="meta" id="newMeta" style="margin:6px 0 12px"></p>
+    <label class="label" for="newIntent">Your intention</label>
+    <textarea id="newIntent" placeholder="What grace are you asking of Our Lady?" style="margin-top:6px"></textarea>
+    <div id="newPick"></div>
+    <div class="row"><button class="btn" id="newCancel">Cancel</button><button class="btn primary" id="newGo">Begin Day 1</button></div>
+  </div>
+</div>
+
+<div class="overlay" id="installOverlay" hidden>
+  <div class="sheet dialog" role="dialog" aria-modal="true" aria-labelledby="installTitle">
+    <h3 id="installTitle">Add to your home screen</h3>
+    <p class="meta" style="margin:6px 0 14px">Rose Garden of Mary opens like an app, works offline, and keeps your Rosaries on this phone.</p>
+    <ol class="install-steps" id="installSteps"></ol>
+    <div class="row"><button class="btn primary" id="installDone">Got it</button></div>
+  </div>
+</div>
+
+<div class="overlay" id="journalOverlay" hidden>
+  <div class="sheet" role="dialog" aria-modal="true" aria-labelledby="journalTitle">
+    <div class="sheet-head"><h3 id="journalTitle">Intentions journal</h3><button class="close" id="journalClose" aria-label="Close journal">×</button></div>
+    <p class="meta" style="margin:0 0 14px">Write down intentions as they come to you. Pray for one in today’s Rosary, or begin a 54-Day Novena for it.</p>
+    <label class="label" for="journalInput">New intention</label>
+    <textarea id="journalInput" placeholder="Someone or something to pray for…" style="margin-top:6px;min-height:80px"></textarea>
+    <div class="row" style="margin-top:8px"><button class="btn primary" id="journalAdd">Add to journal</button></div>
+    <div id="journalList" style="margin-top:18px"></div>
+  </div>
+</div>
+
+<div class="overlay" id="reflOverlay" hidden>
+  <div class="sheet dialog" role="dialog" aria-modal="true" aria-labelledby="reflTitle">
+    <h3 id="reflTitle">Reflection</h3>
+    <p class="meta" id="reflMeta" style="margin:4px 0 12px"></p>
+    <label class="label" for="reflText">What stood out to you while you prayed?</label>
+    <textarea id="reflText" class="notepad" placeholder="A word, a mystery, a thought that stayed with you…"></textarea>
+    <div class="row"><button class="btn" id="reflCancel">Cancel</button><button class="btn primary" id="reflSave">Save reflection</button></div>
+    <div style="text-align:center;margin-top:6px"><button class="link-btn" id="reflDelete" style="color:var(--rose)" hidden>Delete reflection</button></div>
+  </div>
+</div>
+
+<div class="overlay" id="novDayOverlay" hidden>
+  <div class="sheet dialog" role="dialog" aria-modal="true" aria-labelledby="novDayTitle">
+    <div class="popup-day" id="novDayTitle">Day 1</div>
+    <p id="novDayWhen" style="margin:4px 0 0"></p>
+    <div class="refl-preview" id="novDayRefl" hidden><span class="label"><svg width="13" height="13" viewBox="-8 -8 16 16" aria-hidden="true"><polygon class="refl-star" points="0.00,-7.50 1.88,-2.59 7.13,-2.32 3.04,0.99 4.41,6.07 0.00,3.20 -4.41,6.07 -3.04,0.99 -7.13,-2.32 -1.88,-2.59"/></svg> Your reflection</span><p id="novDayReflText"></p></div>
+    <div class="row"><button class="btn" id="novDayKeep">Keep it</button><button class="btn rose" id="novDayUnmark">Unmark day</button></div>
+    <div class="row" style="margin-top:8px"><button class="btn gold" id="novDayRefBtn">Add reflection</button></div>
+    <div class="row" style="margin-top:8px"><button class="btn" id="novDayPray">Open this day’s prayers</button></div>
+  </div>
+</div>
+
+<div class="overlay" id="badgeOverlay" hidden style="align-items:center;z-index:130">
+  <div class="sheet dialog" role="dialog" aria-modal="true" aria-labelledby="badgeTitle" style="text-align:center;max-width:380px;border-radius:24px;margin:16px">
+    <div class="label" id="badgeEyebrow" style="color:var(--rose)">Achievement</div>
+    <div class="badge-big" id="badgeBig"></div>
+    <h3 id="badgeTitle">First Rosary</h3>
+    <p class="meta" id="badgeText" style="margin:6px 0 0;font-size:14px"></p>
+    <div class="row"><button class="btn primary" id="badgeOk">Thanks be to God</button></div>
+  </div>
+</div>
+
+<script>
+/* =====================================================================
+   ✎  EDIT PRAYERS HERE
+   Replace any text below with the version from your own prayer booklet.
+   Each paragraph is its own string in a list. Keep the quotes and commas.
+   ===================================================================== */
+const PRAYERS = {
+  signOfCross: [
+    "In the name of the Father, and of the Son, and of the Holy Spirit. Amen."
+  ],
+  prayerBeforeRosary: [
+    "Queen of the Holy Rosary, you have deigned to come to Fatima to reveal to the three shepherd children the treasures of grace hidden in the Rosary. Inspire my heart with a sincere love of this devotion, in order that by meditating on the Mysteries of our Redemption which are recalled in it, I may be enriched with its fruits and obtain peace for the world, the conversion of sinners and of Russia, and the favor which I ask of you in this Rosary.",
+    "I ask it for the greater glory of God, for your own honor, and for the good of souls, especially for my own. Amen."
+  ],
+  apostlesCreed: "I believe in God, the Father almighty, Creator of heaven and earth, and in Jesus Christ, His only Son, our Lord, who was conceived by the Holy Spirit, born of the Virgin Mary, suffered under Pontius Pilate, was crucified, died and was buried; He descended into hell; on the third day He rose again from the dead; He ascended into heaven, and is seated at the right hand of God the Father almighty; from there He will come to judge the living and the dead. I believe in the Holy Spirit, the holy catholic Church, the communion of saints, the forgiveness of sins, the resurrection of the body, and life everlasting. Amen.",
+  ourFather: "Our Father, who art in heaven, hallowed be Thy name; Thy kingdom come; Thy will be done on earth as it is in heaven. Give us this day our daily bread; and forgive us our trespasses as we forgive those who trespass against us; and lead us not into temptation, but deliver us from evil. Amen.",
+  hailMary: "Hail Mary, full of grace, the Lord is with thee. Blessed art thou among women, and blessed is the fruit of thy womb, Jesus. Holy Mary, Mother of God, pray for us sinners, now and at the hour of our death. Amen.",
+  gloryBe: "Glory be to the Father, and to the Son, and to the Holy Spirit. As it was in the beginning, is now, and ever shall be, world without end. Amen.",
+  fatima: "O my Jesus, forgive us our sins, save us from the fires of hell; lead all souls to heaven, especially those in most need of Thy mercy.",
+  pardonPrayer: "My God, I believe, I adore, I hope, and I love Thee! I ask forgiveness for those who do not believe, do not adore, do not hope, and do not love Thee.",
+  hailHolyQueen: [
+    "Hail, holy Queen, Mother of mercy, our life, our sweetness and our hope. To thee do we cry, poor banished children of Eve. To thee do we send up our sighs, mourning and weeping in this valley of tears. Turn then, most gracious advocate, thine eyes of mercy toward us, and after this our exile, show unto us the blessed fruit of thy womb, Jesus. O clement, O loving, O sweet Virgin Mary.",
+    "V. Pray for us, O holy Mother of God.",
+    "R. That we may be made worthy of the promises of Christ."
+  ],
+  prayerAfterRosary: [
+    "O God, Whose only-begotten Son, by His Life, Death, and Resurrection, has purchased for us the rewards of eternal life; grant, we beseech You, that, meditating upon these Mysteries of the Most Holy Rosary of the Blessed Virgin Mary, we may imitate what they contain and obtain what they promise, through the same Christ our Lord. Amen.",
+    "V. May the divine assistance remain always with us. R. Amen.",
+    "V. And may the souls of the faithful departed, through the mercy of God, rest in peace. R. Amen."
+  ],
+  stJoseph: [
+    "To you, O blessed Joseph,\ndo we come in our tribulation,\nand having implored the help of your most holy Spouse,\nwe confidently invoke your patronage also.",
+    "Through that charity which bound you\nto the Immaculate Virgin Mother of God\nand through the paternal love\nwith which you embraced the Child Jesus,\nwe humbly beg you graciously to regard the inheritance\nwhich Jesus Christ has purchased by his Blood,\nand with your power and strength to aid us in our necessities.",
+    "O most watchful guardian of the Holy Family,\ndefend the chosen children of Jesus Christ;\nO most loving father, ward off from us\nevery contagion of error and corrupting influence;\nO our most mighty protector, be kind to us\nand from heaven assist us in our struggle\nwith the power of darkness.",
+    "As once you rescued the Child Jesus from deadly peril,\nso now protect God’s Holy Church\nfrom the snares of the enemy and from all adversity;\nshield, too, each one of us by your constant protection,\nso that, supported by your example and your aid,\nwe may be able to live piously, to die in holiness,\nand to obtain eternal happiness in heaven.",
+    "Amen."
+  ]
+};
+
+// ===== Latin texts (used when the prayers are switched to Latin) =====
+const PRAYERS_LA = {
+  signOfCross: [
+    "In nomine Patris, et Filii, et Spiritus Sancti. Amen."
+  ],
+  prayerBeforeRosary: [
+    "Regina sacratissimi Rosarii, quae Fatimam venire dignata es, ut tribus pastorulis thesauros gratiae in Rosario absconditos revelares, inspira cordi meo sincerum huius devotionis amorem, ut, meditando mysteria Redemptionis nostrae quae in eo recoluntur, fructibus eius ditari merear, et pacem mundo, conversionem peccatorum et Russiae, atque gratiam quam a te in hoc Rosario peto, obtineam.",
+    "Peto eam ad maiorem Dei gloriam, ad tuum honorem, et ad bonum animarum, praesertim meae. Amen."
+  ],
+  apostlesCreed: "Credo in Deum Patrem omnipotentem, Creatorem caeli et terrae. Et in Iesum Christum, Filium eius unicum, Dominum nostrum, qui conceptus est de Spiritu Sancto, natus ex Maria Virgine, passus sub Pontio Pilato, crucifixus, mortuus, et sepultus, descendit ad inferos, tertia die resurrexit a mortuis, ascendit ad caelos, sedet ad dexteram Dei Patris omnipotentis, inde venturus est iudicare vivos et mortuos. Credo in Spiritum Sanctum, sanctam Ecclesiam catholicam, sanctorum communionem, remissionem peccatorum, carnis resurrectionem, vitam aeternam. Amen.",
+  ourFather: "Pater noster, qui es in caelis, sanctificetur nomen tuum. Adveniat regnum tuum. Fiat voluntas tua, sicut in caelo et in terra. Panem nostrum quotidianum da nobis hodie, et dimitte nobis debita nostra, sicut et nos dimittimus debitoribus nostris. Et ne nos inducas in tentationem, sed libera nos a malo. Amen.",
+  hailMary: "Ave Maria, gratia plena, Dominus tecum. Benedicta tu in mulieribus, et benedictus fructus ventris tui, Iesus. Sancta Maria, Mater Dei, ora pro nobis peccatoribus, nunc et in hora mortis nostrae. Amen.",
+  gloryBe: "Gloria Patri, et Filio, et Spiritui Sancto. Sicut erat in principio, et nunc, et semper, et in saecula saeculorum. Amen.",
+  fatima: "O mi Iesu, dimitte nobis debita nostra, libera nos ab igne inferni, conduc in caelum omnes animas, praesertim illas quae maxime indigent misericordia tua.",
+  pardonPrayer: "Deus meus, ego credo, adoro, spero et amo te! Veniam peto pro iis qui non credunt, non adorant, non sperant et te non amant.",
+  hailHolyQueen: [
+    "Salve, Regina, Mater misericordiae, vita, dulcedo, et spes nostra, salve. Ad te clamamus, exsules filii Hevae. Ad te suspiramus, gementes et flentes in hac lacrimarum valle. Eia ergo, advocata nostra, illos tuos misericordes oculos ad nos converte. Et Iesum, benedictum fructum ventris tui, nobis post hoc exsilium ostende. O clemens, O pia, O dulcis Virgo Maria.",
+    "V. Ora pro nobis, sancta Dei Genetrix.",
+    "R. Ut digni efficiamur promissionibus Christi."
+  ],
+  prayerAfterRosary: [
+    "Oremus. Deus, cuius Unigenitus per vitam, mortem et resurrectionem suam nobis salutis aeternae praemia comparavit: concede, quaesumus, ut haec mysteria sacratissimo beatae Mariae Virginis Rosario recolentes, et imitemur quod continent, et quod promittunt assequamur. Per eundem Christum Dominum nostrum. Amen.",
+    "V. Divinum auxilium maneat semper nobiscum. R. Amen.",
+    "V. Et fidelium animae per misericordiam Dei requiescant in pace. R. Amen."
+  ],
+  stJoseph: [
+    "Ad te, beate Ioseph, in tribulatione nostra confugimus,\natque, implorato Sponsae tuae sanctissimae auxilio,\npatrocinium quoque tuum fidenter exposcimus.",
+    "Per eam, quaesumus, quae te cum immaculata Virgine Dei Genitrice coniunxit, caritatem,\nperque paternum, quo Puerum Iesum amplexus es, amorem,\nsupplices deprecamur, ut ad hereditatem, quam Iesus Christus acquisivit Sanguine suo,\nbenignus respicias,\nac necessitatibus nostris tua virtute et ope succurras.",
+    "Tuere, o Custos providentissime divinae Familiae, Iesu Christi sobolem electam;\nprohibe a nobis, amantissime Pater, omnem errorum ac corruptelarum luem;\npropitius nobis, sospitator noster fortissime,\nin hoc cum potestate tenebrarum certamine e caelo adesto;",
+    "et sicut olim Puerum Iesum e summo eripuisti vitae discrimine,\nita nunc Ecclesiam sanctam Dei ab hostilibus insidiis atque ab omni adversitate defende:\nnosque singulos perpetuo tege patrocinio,\nut ad tui exemplar et ope tua suffulti,\nsancte vivere, pie emori, sempiternamque in caelis beatitudinem assequi possimus.",
+    "Amen."
+  ]
+};
+
+// Each mystery: [name, fruit of the mystery]
+const MYSTERIES = {
+  Joyful:[["The Annunciation","For the love of humility"],["The Visitation","For charity toward my neighbor"],["The Nativity","For love of God"],["The Presentation","For a spirit of sacrifice"],["Finding in the Temple","For zeal for the glory of God"]],
+  Sorrowful:[["Agony in the Garden","For true repentance for my sins"],["Scourging at the Pillar","For a spirit of mortification"],["Crowning with Thorns","For moral courage"],["Carrying of the Cross","For the virtue of patience"],["The Crucifixion","For the grace of final perseverance"]],
+  Glorious:[["The Resurrection","For a strong faith"],["The Ascension","For the virtue of hope"],["The Descent of the Holy Spirit","For zeal for the glory of God"],["The Assumption","For the grace of a happy death"],["The Coronation of the B.V.M.","For a greater love for Mary"]],
+  Luminous:[["The Baptism of Jesus","For living my Baptismal Promises"],["The Miracle at Cana","For doing whatever Jesus says"],["Proclamation of the Kingdom","For seeking God’s forgiveness"],["The Transfiguration","For becoming a new person in Christ"],["Institution of the Eucharist","For active participation at Mass"]]
+};
+// Scriptural Rosary: one verse before each Hail Mary (Douay-Rheims)
+const MYSTERY_VERSES = {"Joyful": [[["Luke 1:26-27", "The angel Gabriel was sent from God into a city of Galilee, called Nazareth, to a virgin espoused to a man whose name was Joseph… and the virgin’s name was Mary."], ["Luke 1:28", "Hail, full of grace, the Lord is with thee: blessed art thou among women."], ["Luke 1:29", "Who having heard, was troubled at his saying, and thought with herself what manner of salutation this should be."], ["Luke 1:30", "Fear not, Mary, for thou hast found grace with God."], ["Luke 1:31", "Behold thou shalt conceive in thy womb, and shalt bring forth a son; and thou shalt call his name Jesus."], ["Luke 1:32", "He shall be great, and shall be called the Son of the most High."], ["Luke 1:34", "How shall this be done, because I know not man?"], ["Luke 1:35", "The Holy Ghost shall come upon thee, and the power of the most High shall overshadow thee."], ["Luke 1:37", "Because no word shall be impossible with God."], ["Luke 1:38", "Behold the handmaid of the Lord; be it done to me according to thy word."]], [["Luke 1:39", "Mary rising up in those days, went into the hill country with haste into a city of Juda."], ["Luke 1:40", "And she entered into the house of Zachary, and saluted Elizabeth."], ["Luke 1:41", "When Elizabeth heard the salutation of Mary, the infant leaped in her womb. And Elizabeth was filled with the Holy Ghost."], ["Luke 1:42", "Blessed art thou among women, and blessed is the fruit of thy womb."], ["Luke 1:43", "And whence is this to me, that the mother of my Lord should come to me?"], ["Luke 1:45", "Blessed art thou that hast believed, because those things shall be accomplished that were spoken to thee by the Lord."], ["Luke 1:46-47", "My soul doth magnify the Lord. And my spirit hath rejoiced in God my Saviour."], ["Luke 1:48", "Because he hath regarded the humility of his handmaid; for behold from henceforth all generations shall call me blessed."], ["Luke 1:49", "Because he that is mighty, hath done great things to me; and holy is his name."], ["Luke 1:56", "And Mary abode with her about three months; and she returned to her own house."]], [["Luke 2:1", "There went out a decree from Caesar Augustus, that the whole world should be enrolled."], ["Luke 2:4-5", "Joseph also went up from Galilee… into the city of David, which is called Bethlehem… to be enrolled with Mary his espoused wife, who was with child."], ["Luke 2:7", "She brought forth her firstborn son, and wrapped him up in swaddling clothes, and laid him in a manger; because there was no room for them in the inn."], ["Luke 2:8", "There were in the same country shepherds watching, and keeping the night watches over their flock."], ["Luke 2:10", "Fear not; for, behold, I bring you good tidings of great joy, that shall be to all the people."], ["Luke 2:11", "For, this day, is born to you a Saviour, who is Christ the Lord, in the city of David."], ["Luke 2:14", "Glory to God in the highest; and on earth peace to men of good will."], ["Luke 2:16", "They came with haste; and they found Mary and Joseph, and the infant lying in the manger."], ["Matthew 2:11", "Entering into the house, they found the child with Mary his mother, and falling down they adored him."], ["Luke 2:19", "But Mary kept all these words, pondering them in her heart."]], [["Luke 2:22", "They carried him to Jerusalem, to present him to the Lord."], ["Luke 2:23", "Every male opening the womb shall be called holy to the Lord."], ["Luke 2:24", "And to offer a sacrifice… a pair of turtledoves, or two young pigeons."], ["Luke 2:25", "There was a man in Jerusalem named Simeon, and this man was just and devout, waiting for the consolation of Israel."], ["Luke 2:26", "He had received an answer from the Holy Ghost, that he should not see death, before he had seen the Christ of the Lord."], ["Luke 2:28", "He also took him into his arms, and blessed God."], ["Luke 2:29-30", "Now thou dost dismiss thy servant, O Lord, according to thy word in peace; because my eyes have seen thy salvation."], ["Luke 2:32", "A light to the revelation of the Gentiles, and the glory of thy people Israel."], ["Luke 2:34", "Behold this child is set for the fall, and for the resurrection of many in Israel, and for a sign which shall be contradicted."], ["Luke 2:35", "And thy own soul a sword shall pierce, that, out of many hearts, thoughts may be revealed."]], [["Luke 2:41", "His parents went every year to Jerusalem, at the solemn day of the pasch."], ["Luke 2:42", "When he was twelve years old, they going up into Jerusalem, according to the custom of the feast."], ["Luke 2:43", "The child Jesus remained in Jerusalem; and his parents knew it not."], ["Luke 2:44", "Thinking that he was in the company, they came a day’s journey, and sought him among their kinsfolks and acquaintance."], ["Luke 2:45", "And not finding him, they returned into Jerusalem, seeking him."], ["Luke 2:46", "After three days, they found him in the temple, sitting in the midst of the doctors, hearing them, and asking them questions."], ["Luke 2:47", "And all that heard him were astonished at his wisdom and his answers."], ["Luke 2:48", "Son, why hast thou done so to us? behold thy father and I have sought thee sorrowing."], ["Luke 2:49", "Did you not know, that I must be about my father’s business?"], ["Luke 2:51-52", "He went down with them, and came to Nazareth, and was subject to them… And Jesus advanced in wisdom, and age, and grace with God and men."]]], "Sorrowful": [[["Matthew 26:36", "Jesus came with them into a country place which is called Gethsemani… Sit you here, till I go yonder and pray."], ["Matthew 26:37", "He began to grow sorrowful and to be sad."], ["Matthew 26:38", "My soul is sorrowful even unto death: stay you here, and watch with me."], ["Matthew 26:39", "My Father, if it be possible, let this chalice pass from me. Nevertheless not as I will, but as thou wilt."], ["Luke 22:43", "And there appeared to him an angel from heaven, strengthening him."], ["Luke 22:44", "Being in an agony, he prayed the longer. And his sweat became as drops of blood, trickling down upon the ground."], ["Matthew 26:40", "What? Could you not watch one hour with me?"], ["Matthew 26:41", "Watch ye, and pray that ye enter not into temptation. The spirit indeed is willing, but the flesh weak."], ["Matthew 26:42", "My Father, if this chalice may not pass away, but I must drink it, thy will be done."], ["Luke 22:48", "Judas, dost thou betray the Son of man with a kiss?"]], [["Matthew 27:1", "When morning was come, all the chief priests and ancients of the people took counsel against Jesus, that they might put him to death."], ["Mark 15:1", "Binding Jesus, they led him away, and delivered him to Pilate."], ["John 18:33", "Art thou the king of the Jews?"], ["John 18:36", "My kingdom is not of this world."], ["John 18:37", "For this was I born, and for this came I into the world; that I should give testimony to the truth."], ["John 18:38", "Pilate saith to him: What is truth?… I find no cause in him."], ["Matthew 27:22", "What shall I do then with Jesus that is called Christ? They say all: Let him be crucified."], ["John 19:1", "Then therefore, Pilate took Jesus, and scourged him."], ["Isaias 53:5", "He was wounded for our iniquities, he was bruised for our sins… and by his bruises we are healed."], ["Isaias 53:7", "He was offered because it was his own will, and he opened not his mouth: he shall be led as a sheep to the slaughter."]], [["Matthew 27:27", "The soldiers of the governor taking Jesus into the hall, gathered together unto him the whole band."], ["Matthew 27:28", "And stripping him, they put a scarlet cloak about him."], ["Matthew 27:29", "Platting a crown of thorns, they put it upon his head, and a reed in his right hand."], ["Matthew 27:29", "And bowing the knee before him, they mocked him, saying: Hail, king of the Jews."], ["Matthew 27:30", "And spitting upon him, they took the reed, and struck his head."], ["John 19:5", "Jesus therefore came forth, bearing the crown of thorns and the purple garment. And he saith to them: Behold the Man."], ["John 19:6", "When the chief priests… had seen him, they cried out, saying: Crucify him, crucify him."], ["John 19:15", "We have no king but Caesar."], ["Isaias 53:3", "Despised, and the most abject of men, a man of sorrows, and acquainted with infirmity."], ["John 19:16", "Then therefore he delivered him to them to be crucified."]], [["John 19:17", "Bearing his own cross, he went forth to that place which is called Calvary."], ["Matthew 16:24", "If any man will come after me, let him deny himself, and take up his cross, and follow me."], ["Luke 23:26", "They laid hold of one Simon of Cyrene… and they laid the cross on him to carry after Jesus."], ["Luke 23:27", "There followed him a great multitude of people, and of women, who bewailed and lamented him."], ["Luke 23:28", "Daughters of Jerusalem, weep not over me; but weep for yourselves, and for your children."], ["Matthew 11:28", "Come to me, all you that labour, and are burdened, and I will refresh you."], ["Matthew 11:29", "Take up my yoke upon you, and learn of me, because I am meek, and humble of heart."], ["Matthew 11:30", "For my yoke is sweet and my burden light."], ["Isaias 53:4", "Surely he hath borne our infirmities and carried our sorrows."], ["Luke 23:32", "And there were also two other malefactors led with him to be put to death."]], [["Luke 23:33", "When they were come to the place which is called Calvary, they crucified him there."], ["Luke 23:34", "Father, forgive them, for they know not what they do."], ["Luke 23:42", "Lord, remember me when thou shalt come into thy kingdom."], ["Luke 23:43", "Amen I say to thee, this day thou shalt be with me in paradise."], ["John 19:25", "Now there stood by the cross of Jesus, his mother."], ["John 19:26", "Woman, behold thy son."], ["John 19:27", "After that, he saith to the disciple: Behold thy mother."], ["Matthew 27:46", "My God, my God, why hast thou forsaken me?"], ["Luke 23:46", "Father, into thy hands I commend my spirit."], ["John 19:30", "It is consummated. And bowing his head, he gave up the ghost."]]], "Glorious": [[["Mark 16:2", "Very early in the morning, the first day of the week, they come to the sepulchre, the sun being now risen."], ["Mark 16:3", "Who shall roll us back the stone from the door of the sepulchre?"], ["Matthew 28:2", "An angel of the Lord descended from heaven, and coming, rolled back the stone, and sat upon it."], ["Matthew 28:5", "Fear not you; for I know that you seek Jesus who was crucified."], ["Matthew 28:6", "He is not here, for he is risen, as he said."], ["Matthew 28:7", "Go quickly, and tell ye his disciples that he is risen."], ["John 20:16", "Jesus saith to her: Mary. She turning, saith to him: Rabboni."], ["John 20:19", "Jesus came and stood in the midst, and said to them: Peace be to you."], ["John 20:28", "My Lord, and my God."], ["John 20:29", "Blessed are they that have not seen, and have believed."]], [["Acts 1:3", "He shewed himself alive after his passion, by many proofs, for forty days appearing to them, and speaking of the kingdom of God."], ["Matthew 28:18", "All power is given to me in heaven and in earth."], ["Matthew 28:19", "Going therefore, teach ye all nations; baptizing them in the name of the Father, and of the Son, and of the Holy Ghost."], ["Mark 16:16", "He that believeth and is baptized, shall be saved."], ["Matthew 28:20", "Behold I am with you all days, even to the consummation of the world."], ["Acts 1:8", "You shall receive the power of the Holy Ghost coming upon you, and you shall be witnesses unto me."], ["Acts 1:9", "While they looked on, he was raised up: and a cloud received him out of their sight."], ["Mark 16:19", "He was taken up into heaven, and sitteth on the right hand of God."], ["Acts 1:11", "This Jesus who is taken up from you into heaven, shall so come, as you have seen him going into heaven."], ["John 14:2", "In my Father’s house there are many mansions… I go to prepare a place for you."]], [["Acts 1:14", "All these were persevering with one mind in prayer with the women, and Mary the mother of Jesus."], ["Acts 2:1", "When the days of the Pentecost were accomplished, they were all together in one place."], ["Acts 2:2", "Suddenly there came a sound from heaven, as of a mighty wind coming."], ["Acts 2:3", "There appeared to them parted tongues as it were of fire, and it sat upon every one of them."], ["Acts 2:4", "They were all filled with the Holy Ghost, and they began to speak with divers tongues."], ["John 14:26", "The Paraclete, the Holy Ghost, whom the Father will send in my name, he will teach you all things."], ["John 14:27", "Peace I leave with you, my peace I give unto you."], ["Acts 2:38", "Do penance, and be baptized every one of you in the name of Jesus Christ, for the remission of your sins: and you shall receive the gift of the Holy Ghost."], ["Acts 2:41", "There were added in that day about three thousand souls."], ["Galatians 5:22", "The fruit of the Spirit is, charity, joy, peace, patience, benignity, goodness, longanimity."]], [["Genesis 3:15", "I will put enmities between thee and the woman… she shall crush thy head."], ["Psalm 44:11", "Hearken, O daughter, and see, and incline thy ear."], ["Canticle 2:10", "Arise, make haste, my love, my dove, my beautiful one, and come."], ["Canticle 4:7", "Thou art all fair, O my love, and there is not a spot in thee."], ["Canticle 6:9", "Who is she that cometh forth as the morning rising, fair as the moon, bright as the sun?"], ["Judith 15:10", "Thou art the glory of Jerusalem, thou art the joy of Israel, thou art the honour of our people."], ["Psalm 131:8", "Arise, O Lord, into thy resting place: thou and the ark, which thou hast sanctified."], ["Apocalypse 11:19", "The temple of God was opened in heaven: and the ark of his testament was seen in his temple."], ["1 Corinthians 15:22-23", "As in Adam all die, so also in Christ all shall be made alive. But every one in his own order."], ["1 Corinthians 15:54", "Death is swallowed up in victory."]], [["Apocalypse 12:1", "A great sign appeared in heaven: A woman clothed with the sun, and the moon under her feet, and on her head a crown of twelve stars."], ["Psalm 44:10", "The queen stood on thy right hand, in gilded clothing; surrounded with variety."], ["3 Kings 2:19", "A throne was set for the king’s mother, and she sat on his right hand."], ["Luke 1:52", "He hath put down the mighty from their seat, and hath exalted the humble."], ["Ecclesiasticus 24:24", "I am the mother of fair love, and of fear, and of knowledge, and of holy hope."], ["Proverbs 8:35", "He that shall find me, shall find life, and shall have salvation from the Lord."], ["Apocalypse 2:10", "Be thou faithful until death: and I will give thee the crown of life."], ["2 Timothy 4:8", "There is laid up for me a crown of justice, which the Lord the just judge will render to me in that day."], ["Romans 8:18", "The sufferings of this time are not worthy to be compared with the glory to come, that shall be revealed in us."], ["1 Corinthians 2:9", "Eye hath not seen, nor ear heard, neither hath it entered into the heart of man, what things God hath prepared for them that love him."]]], "Luminous": [[["Matthew 3:1-2", "John the Baptist came preaching in the desert of Judea, saying: Do penance: for the kingdom of heaven is at hand."], ["Matthew 3:3", "Prepare ye the way of the Lord, make straight his paths."], ["Matthew 3:11", "I indeed baptize you in water unto penance, but he that shall come after me, is mightier than I."], ["Matthew 3:13", "Then cometh Jesus from Galilee to the Jordan, unto John, to be baptized by him."], ["Matthew 3:14", "I ought to be baptized by thee, and comest thou to me?"], ["Matthew 3:15", "Suffer it to be so now. For so it becometh us to fulfil all justice."], ["Matthew 3:16", "The heavens were opened to him: and he saw the Spirit of God descending as a dove, and coming upon him."], ["Matthew 3:17", "This is my beloved Son, in whom I am well pleased."], ["John 1:29", "Behold the Lamb of God, behold him who taketh away the sin of the world."], ["John 3:5", "Unless a man be born again of water and the Holy Ghost, he cannot enter into the kingdom of God."]], [["John 2:1", "There was a marriage in Cana of Galilee: and the mother of Jesus was there."], ["John 2:2", "And Jesus also was invited, and his disciples, to the marriage."], ["John 2:3", "The wine failing, the mother of Jesus saith to him: They have no wine."], ["John 2:4", "Woman, what is that to me and to thee? my hour is not yet come."], ["John 2:5", "Whatsoever he shall say to you, do ye."], ["John 2:6", "Now there were set there six waterpots of stone."], ["John 2:7", "Fill the waterpots with water. And they filled them up to the brim."], ["John 2:8", "Draw out now, and carry to the chief steward of the feast."], ["John 2:10", "Thou hast kept the good wine until now."], ["John 2:11", "This beginning of miracles did Jesus in Cana of Galilee; and manifested his glory, and his disciples believed in him."]], [["Mark 1:15", "The time is accomplished, and the kingdom of God is at hand: repent, and believe the gospel."], ["Matthew 5:3", "Blessed are the poor in spirit: for theirs is the kingdom of heaven."], ["Matthew 5:5", "Blessed are they that mourn: for they shall be comforted."], ["Matthew 5:7", "Blessed are the merciful: for they shall obtain mercy."], ["Matthew 5:8", "Blessed are the clean of heart: for they shall see God."], ["Matthew 5:9", "Blessed are the peacemakers: for they shall be called the children of God."], ["Matthew 6:33", "Seek ye therefore first the kingdom of God, and his justice, and all these things shall be added unto you."], ["Mark 2:5", "Son, thy sins are forgiven thee."], ["Luke 15:7", "There shall be joy in heaven upon one sinner that doth penance."], ["John 20:23", "Whose sins you shall forgive, they are forgiven them."]], [["Matthew 17:1", "Jesus taketh unto him Peter and James, and John his brother, and bringeth them up into a high mountain apart."], ["Luke 9:29", "Whilst he prayed, the shape of his countenance was altered."], ["Matthew 17:2", "His face did shine as the sun: and his garments became white as snow."], ["Matthew 17:3", "And behold there appeared to them Moses and Elias talking with him."], ["Matthew 17:4", "Lord, it is good for us to be here."], ["Matthew 17:5", "A bright cloud overshadowed them. And lo, a voice out of the cloud, saying: This is my most beloved Son, in whom I am well pleased: hear ye him."], ["Matthew 17:6", "The disciples hearing, fell upon their face, and were very much afraid."], ["Matthew 17:7", "Arise, and fear not."], ["Matthew 17:8", "They lifting up their eyes saw no one but only Jesus."], ["2 Corinthians 5:17", "If then any be in Christ a new creature, the old things are passed away, behold all things are made new."]], [["John 13:1", "Having loved his own who were in the world, he loved them unto the end."], ["Luke 22:15", "With desire I have desired to eat this pasch with you, before I suffer."], ["Matthew 26:26", "Jesus took bread, and blessed, and broke: and gave to his disciples, and said: Take ye, and eat. This is my body."], ["Matthew 26:27-28", "Taking the chalice, he gave thanks… saying: Drink ye all of this. For this is my blood of the new testament."], ["Luke 22:19", "Do this for a commemoration of me."], ["John 6:35", "I am the bread of life: he that cometh to me shall not hunger."], ["John 6:52", "I am the living bread which came down from heaven. If any man eat of this bread, he shall live for ever."], ["John 6:57", "He that eateth my flesh, and drinketh my blood, abideth in me, and I in him."], ["1 Corinthians 11:26", "As often as you shall eat this bread, and drink the chalice, you shall shew the death of the Lord, until he come."], ["Luke 24:30-31", "He took bread, and blessed, and brake, and gave to them. And their eyes were opened, and they knew him."]]]};
+const MYSTERIES_LA = {"Joyful": [["Annuntiatio", "Pro amore humilitatis"], ["Visitatio", "Pro caritate erga proximum"], ["Nativitas Domini", "Pro amore Dei"], ["Praesentatio in Templo", "Pro spiritu sacrificii"], ["Inventio in Templo", "Pro zelo gloriae Dei"]], "Sorrowful": [["Agonia in Horto", "Pro vera paenitentia peccatorum meorum"], ["Flagellatio ad Columnam", "Pro spiritu mortificationis"], ["Coronatio Spinis", "Pro fortitudine morali"], ["Baiulatio Crucis", "Pro virtute patientiae"], ["Crucifixio et Mors", "Pro gratia finalis perseverantiae"]], "Glorious": [["Resurrectio", "Pro fide firma"], ["Ascensio", "Pro virtute spei"], ["Descensus Spiritus Sancti", "Pro zelo gloriae Dei"], ["Assumptio B.M.V.", "Pro gratia bonae mortis"], ["Coronatio B.M.V.", "Pro maiore amore erga Mariam"]], "Luminous": [["Baptisma in Iordane", "Ut promissiones baptismales vivam"], ["Nuptiae in Cana", "Ut faciam quodcumque Iesus dicit"], ["Annuntiatio Regni", "Ut veniam Dei quaeram"], ["Transfiguratio", "Ut novus homo in Christo fiam"], ["Institutio Eucharistiae", "Pro actuosa participatione in Missa"]]};
+const MYSTERY_VERSES_LA = {"Joyful": [["Missus est angelus Gabriel a Deo in civitatem Galilaeae, cui nomen Nazareth, ad virginem desponsatam viro, cui nomen erat Ioseph… et nomen virginis Maria.", "Ave gratia plena: Dominus tecum: benedicta tu in mulieribus.", "Quae cum audisset, turbata est in sermone eius, et cogitabat qualis esset ista salutatio.", "Ne timeas, Maria, invenisti enim gratiam apud Deum.", "Ecce concipies in utero, et paries filium, et vocabis nomen eius Iesum.", "Hic erit magnus, et Filius Altissimi vocabitur.", "Quomodo fiet istud, quoniam virum non cognosco?", "Spiritus Sanctus superveniet in te, et virtus Altissimi obumbrabit tibi.", "Quia non erit impossibile apud Deum omne verbum.", "Ecce ancilla Domini, fiat mihi secundum verbum tuum."], ["Exsurgens autem Maria in diebus illis abiit in montana cum festinatione, in civitatem Iuda.", "Et intravit in domum Zachariae, et salutavit Elisabeth.", "Ut audivit salutationem Mariae Elisabeth, exsultavit infans in utero eius: et repleta est Spiritu Sancto Elisabeth.", "Benedicta tu inter mulieres, et benedictus fructus ventris tui.", "Et unde hoc mihi, ut veniat mater Domini mei ad me?", "Beata, quae credidisti, quoniam perficientur ea, quae dicta sunt tibi a Domino.", "Magnificat anima mea Dominum: et exsultavit spiritus meus in Deo salutari meo.", "Quia respexit humilitatem ancillae suae: ecce enim ex hoc beatam me dicent omnes generationes.", "Quia fecit mihi magna qui potens est: et sanctum nomen eius.", "Mansit autem Maria cum illa quasi mensibus tribus: et reversa est in domum suam."], ["Exiit edictum a Caesare Augusto ut describeretur universus orbis.", "Ascendit autem et Ioseph a Galilaea… in civitatem David, quae vocatur Bethlehem… ut profiteretur cum Maria desponsata sibi uxore praegnante.", "Et peperit filium suum primogenitum, et pannis eum involvit, et reclinavit eum in praesepio: quia non erat eis locus in diversorio.", "Et pastores erant in regione eadem vigilantes, et custodientes vigilias noctis super gregem suum.", "Nolite timere: ecce enim evangelizo vobis gaudium magnum, quod erit omni populo.", "Quia natus est vobis hodie Salvator, qui est Christus Dominus, in civitate David.", "Gloria in altissimis Deo, et in terra pax hominibus bonae voluntatis.", "Et venerunt festinantes: et invenerunt Mariam, et Ioseph, et infantem positum in praesepio.", "Et intrantes domum, invenerunt puerum cum Maria matre eius, et procidentes adoraverunt eum.", "Maria autem conservabat omnia verba haec, conferens in corde suo."], ["Tulerunt illum in Ierusalem, ut sisterent eum Domino.", "Omne masculinum adaperiens vulvam, sanctum Domino vocabitur.", "Et ut darent hostiam… par turturum, aut duos pullos columbarum.", "Et ecce homo erat in Ierusalem, cui nomen Simeon, et homo iste iustus et timoratus, exspectans consolationem Israel.", "Et responsum acceperat a Spiritu Sancto, non visurum se mortem, nisi prius videret Christum Domini.", "Et ipse accepit eum in ulnas suas: et benedixit Deum.", "Nunc dimittis servum tuum, Domine, secundum verbum tuum in pace: quia viderunt oculi mei salutare tuum.", "Lumen ad revelationem gentium, et gloriam plebis tuae Israel.", "Ecce positus est hic in ruinam, et in resurrectionem multorum in Israel: et in signum, cui contradicetur.", "Et tuam ipsius animam pertransibit gladius, ut revelentur ex multis cordibus cogitationes."], ["Et ibant parentes eius per omnes annos in Ierusalem, in die solemni Paschae.", "Et cum factus esset annorum duodecim, ascendentibus illis Ierosolymam secundum consuetudinem diei festi.", "Remansit puer Iesus in Ierusalem, et non cognoverunt parentes eius.", "Existimantes autem illum esse in comitatu, venerunt iter diei, et requirebant eum inter cognatos et notos.", "Et non invenientes, regressi sunt in Ierusalem, requirentes eum.", "Post triduum invenerunt illum in templo sedentem in medio doctorum, audientem illos, et interrogantem eos.", "Stupebant autem omnes, qui eum audiebant, super prudentia et responsis eius.", "Fili, quid fecisti nobis sic? ecce pater tuus et ego dolentes quaerebamus te.", "Nesciebatis quia in his, quae Patris mei sunt, oportet me esse?", "Et descendit cum eis, et venit Nazareth: et erat subditus illis… Et Iesus proficiebat sapientia, et aetate, et gratia apud Deum et homines."]], "Sorrowful": [["Venit Iesus cum illis in villam, quae dicitur Gethsemani… Sedete hic donec vadam illuc, et orem.", "Coepit contristari et maestus esse.", "Tristis est anima mea usque ad mortem: sustinete hic, et vigilate mecum.", "Pater mi, si possibile est, transeat a me calix iste: verumtamen non sicut ego volo, sed sicut tu.", "Apparuit autem illi angelus de caelo, confortans eum.", "Et factus in agonia, prolixius orabat. Et factus est sudor eius sicut guttae sanguinis decurrentis in terram.", "Sic non potuistis una hora vigilare mecum?", "Vigilate, et orate ut non intretis in tentationem. Spiritus quidem promptus est, caro autem infirma.", "Pater mi, si non potest hic calix transire nisi bibam illum, fiat voluntas tua.", "Iuda, osculo Filium hominis tradis?"], ["Mane autem facto, consilium inierunt omnes principes sacerdotum et seniores populi adversus Iesum, ut eum morti traderent.", "Vincientes Iesum, duxerunt, et tradiderunt Pilato.", "Tu es rex Iudaeorum?", "Regnum meum non est de hoc mundo.", "Ego in hoc natus sum, et ad hoc veni in mundum, ut testimonium perhibeam veritati.", "Dicit ei Pilatus: Quid est veritas?… Ego nullam invenio in eo causam.", "Quid igitur faciam de Iesu, qui dicitur Christus? Dicunt omnes: Crucifigatur.", "Tunc ergo apprehendit Pilatus Iesum, et flagellavit.", "Ipse autem vulneratus est propter iniquitates nostras, attritus est propter scelera nostra… et livore eius sanati sumus.", "Oblatus est quia ipse voluit, et non aperuit os suum: sicut ovis ad occisionem ducetur."], ["Tunc milites praesidis suscipientes Iesum in praetorium, congregaverunt ad eum universam cohortem.", "Et exuentes eum, chlamydem coccineam circumdederunt ei.", "Et plectentes coronam de spinis, posuerunt super caput eius, et arundinem in dextera eius.", "Et genu flexo ante eum, illudebant ei, dicentes: Ave rex Iudaeorum.", "Et exspuentes in eum, acceperunt arundinem, et percutiebant caput eius.", "Exivit ergo Iesus portans coronam spineam, et purpureum vestimentum. Et dicit eis: Ecce homo.", "Cum ergo vidissent eum pontifices… clamabant, dicentes: Crucifige, crucifige eum.", "Non habemus regem, nisi Caesarem.", "Despectum, et novissimum virorum, virum dolorum, et scientem infirmitatem.", "Tunc ergo tradidit eis illum ut crucifigeretur."], ["Et baiulans sibi crucem exivit in eum, qui dicitur Calvariae, locum.", "Si quis vult post me venire, abneget semetipsum, et tollat crucem suam, et sequatur me.", "Apprehenderunt Simonem quemdam Cyrenensem… et imposuerunt illi crucem portare post Iesum.", "Sequebatur autem illum multa turba populi, et mulierum, quae plangebant et lamentabantur eum.", "Filiae Ierusalem, nolite flere super me, sed super vos ipsas flete, et super filios vestros.", "Venite ad me omnes, qui laboratis, et onerati estis, et ego reficiam vos.", "Tollite iugum meum super vos, et discite a me, quia mitis sum, et humilis corde.", "Iugum enim meum suave est, et onus meum leve.", "Vere languores nostros ipse tulit, et dolores nostros ipse portavit.", "Ducebantur autem et alii duo nequam cum eo, ut interficerentur."], ["Postquam venerunt in locum, qui vocatur Calvariae, ibi crucifixerunt eum.", "Pater, dimitte illis: non enim sciunt quid faciunt.", "Domine, memento mei cum veneris in regnum tuum.", "Amen dico tibi: hodie mecum eris in paradiso.", "Stabant autem iuxta crucem Iesu mater eius.", "Mulier, ecce filius tuus.", "Deinde dicit discipulo: Ecce mater tua.", "Deus meus, Deus meus, ut quid dereliquisti me?", "Pater, in manus tuas commendo spiritum meum.", "Consummatum est. Et inclinato capite tradidit spiritum."]], "Glorious": [["Valde mane una sabbatorum, veniunt ad monumentum, orto iam sole.", "Quis revolvet nobis lapidem ab ostio monumenti?", "Angelus enim Domini descendit de caelo: et accedens revolvit lapidem, et sedebat super eum.", "Nolite timere vos: scio enim, quod Iesum, qui crucifixus est, quaeritis.", "Non est hic: surrexit enim, sicut dixit.", "Cito euntes, dicite discipulis eius quia surrexit.", "Dicit ei Iesus: Maria. Conversa illa, dicit ei: Rabboni.", "Venit Iesus, et stetit in medio, et dixit eis: Pax vobis.", "Dominus meus, et Deus meus.", "Beati qui non viderunt, et crediderunt."], ["Praebuit seipsum vivum post passionem suam in multis argumentis, per dies quadraginta apparens eis, et loquens de regno Dei.", "Data est mihi omnis potestas in caelo et in terra.", "Euntes ergo docete omnes gentes: baptizantes eos in nomine Patris, et Filii, et Spiritus Sancti.", "Qui crediderit, et baptizatus fuerit, salvus erit.", "Ecce ego vobiscum sum omnibus diebus, usque ad consummationem saeculi.", "Accipietis virtutem supervenientis Spiritus Sancti in vos, et eritis mihi testes.", "Videntibus illis, elevatus est: et nubes suscepit eum ab oculis eorum.", "Assumptus est in caelum, et sedet a dextris Dei.", "Hic Iesus, qui assumptus est a vobis in caelum, sic veniet quemadmodum vidistis eum euntem in caelum.", "In domo Patris mei mansiones multae sunt… vado parare vobis locum."], ["Hi omnes erant perseverantes unanimiter in oratione cum mulieribus, et Maria matre Iesu.", "Cum complerentur dies Pentecostes, erant omnes pariter in eodem loco.", "Factus est repente de caelo sonus, tamquam advenientis spiritus vehementis.", "Apparuerunt illis dispertitae linguae tamquam ignis, seditque supra singulos eorum.", "Repleti sunt omnes Spiritu Sancto, et coeperunt loqui variis linguis.", "Paraclitus autem Spiritus Sanctus, quem mittet Pater in nomine meo, ille vos docebit omnia.", "Pacem relinquo vobis, pacem meam do vobis.", "Poenitentiam agite, et baptizetur unusquisque vestrum in nomine Iesu Christi in remissionem peccatorum vestrorum: et accipietis donum Spiritus Sancti.", "Appositae sunt in die illa animae circiter tria millia.", "Fructus autem Spiritus est: caritas, gaudium, pax, patientia, benignitas, bonitas, longanimitas."], ["Inimicitias ponam inter te et mulierem… ipsa conteret caput tuum.", "Audi, filia, et vide, et inclina aurem tuam.", "Surge, propera, amica mea, columba mea, formosa mea, et veni.", "Tota pulchra es, amica mea, et macula non est in te.", "Quae est ista, quae progreditur quasi aurora consurgens, pulchra ut luna, electa ut sol?", "Tu gloria Ierusalem, tu laetitia Israel, tu honorificentia populi nostri.", "Surge, Domine, in requiem tuam, tu et arca sanctificationis tuae.", "Et apertum est templum Dei in caelo: et visa est arca testamenti eius in templo eius.", "Sicut in Adam omnes moriuntur, ita et in Christo omnes vivificabuntur. Unusquisque autem in suo ordine.", "Absorpta est mors in victoria."], ["Signum magnum apparuit in caelo: mulier amicta sole, et luna sub pedibus eius, et in capite eius corona stellarum duodecim.", "Astitit regina a dextris tuis in vestitu deaurato, circumdata varietate.", "Positus est thronus matri regis, quae sedit ad dexteram eius.", "Deposuit potentes de sede, et exaltavit humiles.", "Ego mater pulchrae dilectionis, et timoris, et agnitionis, et sanctae spei.", "Qui me invenerit, inveniet vitam, et hauriet salutem a Domino.", "Esto fidelis usque ad mortem, et dabo tibi coronam vitae.", "In reliquo reposita est mihi corona iustitiae, quam reddet mihi Dominus in illa die, iustus iudex.", "Non sunt condignae passiones huius temporis ad futuram gloriam, quae revelabitur in nobis.", "Quod oculus non vidit, nec auris audivit, nec in cor hominis ascendit, quae praeparavit Deus iis qui diligunt illum."]], "Luminous": [["Venit Ioannes Baptista praedicans in deserto Iudaeae, et dicens: Poenitentiam agite: appropinquavit enim regnum caelorum.", "Parate viam Domini: rectas facite semitas eius.", "Ego quidem baptizo vos in aqua in poenitentiam: qui autem post me venturus est, fortior me est.", "Tunc venit Iesus a Galilaea in Iordanem ad Ioannem, ut baptizaretur ab eo.", "Ego a te debeo baptizari, et tu venis ad me?", "Sine modo: sic enim decet nos implere omnem iustitiam.", "Aperti sunt ei caeli: et vidit Spiritum Dei descendentem sicut columbam, et venientem super se.", "Hic est Filius meus dilectus, in quo mihi complacui.", "Ecce agnus Dei, ecce qui tollit peccatum mundi.", "Nisi quis renatus fuerit ex aqua et Spiritu Sancto, non potest introire in regnum Dei."], ["Nuptiae factae sunt in Cana Galilaeae: et erat mater Iesu ibi.", "Vocatus est autem et Iesus, et discipuli eius ad nuptias.", "Et deficiente vino, dicit mater Iesu ad eum: Vinum non habent.", "Quid mihi et tibi est, mulier? nondum venit hora mea.", "Quodcumque dixerit vobis, facite.", "Erant autem ibi lapideae hydriae sex positae.", "Implete hydrias aqua. Et impleverunt eas usque ad summum.", "Haurite nunc, et ferte architriclino.", "Tu autem servasti bonum vinum usque adhuc.", "Hoc fecit initium signorum Iesus in Cana Galilaeae: et manifestavit gloriam suam, et crediderunt in eum discipuli eius."], ["Impletum est tempus, et appropinquavit regnum Dei: poenitemini, et credite Evangelio.", "Beati pauperes spiritu: quoniam ipsorum est regnum caelorum.", "Beati qui lugent: quoniam ipsi consolabuntur.", "Beati misericordes: quoniam ipsi misericordiam consequentur.", "Beati mundo corde: quoniam ipsi Deum videbunt.", "Beati pacifici: quoniam filii Dei vocabuntur.", "Quaerite ergo primum regnum Dei, et iustitiam eius: et haec omnia adiicientur vobis.", "Fili, dimittuntur tibi peccata tua.", "Gaudium erit in caelo super uno peccatore poenitentiam agente.", "Quorum remiseritis peccata, remittuntur eis."], ["Assumit Iesus Petrum, et Iacobum, et Ioannem fratrem eius, et ducit illos in montem excelsum seorsum.", "Dum oraret, facta est species vultus eius altera.", "Resplenduit facies eius sicut sol: vestimenta autem eius facta sunt alba sicut nix.", "Et ecce apparuerunt illis Moyses et Elias cum eo loquentes.", "Domine, bonum est nos hic esse.", "Nubes lucida obumbravit eos. Et ecce vox de nube, dicens: Hic est Filius meus dilectus, in quo mihi bene complacui: ipsum audite.", "Audientes discipuli ceciderunt in faciem suam, et timuerunt valde.", "Surgite, et nolite timere.", "Levantes autem oculos suos, neminem viderunt, nisi solum Iesum.", "Si qua ergo in Christo nova creatura, vetera transierunt, ecce facta sunt omnia nova."], ["Cum dilexisset suos, qui erant in mundo, in finem dilexit eos.", "Desiderio desideravi hoc Pascha manducare vobiscum, antequam patiar.", "Accepit Iesus panem, et benedixit, ac fregit, deditque discipulis suis, et ait: Accipite, et comedite: hoc est corpus meum.", "Et accipiens calicem gratias egit… dicens: Bibite ex hoc omnes. Hic est enim sanguis meus novi testamenti.", "Hoc facite in meam commemorationem.", "Ego sum panis vitae: qui venit ad me, non esuriet.", "Ego sum panis vivus, qui de caelo descendi. Si quis manducaverit ex hoc pane, vivet in aeternum.", "Qui manducat meam carnem, et bibit meum sanguinem, in me manet, et ego in illo.", "Quotiescumque enim manducabitis panem hunc, et calicem bibetis, mortem Domini annuntiabitis donec veniat.", "Accepit panem, et benedixit, ac fregit, et porrigebat illis. Et aperti sunt oculi eorum, et cognoverunt eum."]]};
+
+// Schedule from the booklet:
+//  Joyful: Mondays & Saturdays, Sundays of Advent, Sundays from Epiphany until Lent
+//  Sorrowful: Tuesdays & Fridays, and daily from Ash Wednesday until Easter Sunday
+//  Glorious: Wednesdays, and Sundays from Easter until Advent
+//  Luminous: Thursdays
+// (Sundays between Christmas and Epiphany use the Joyful Mysteries.)
+function easterDate(y){const a=y%19,b=Math.floor(y/100),c=y%100,d=Math.floor(b/4),e=b%4,f=Math.floor((b+8)/25),g=Math.floor((b-f+1)/3),h=(19*a+b-d-g+15)%30,i=Math.floor(c/4),k=c%4,l=(32+2*e+2*i-h-k)%7,m=Math.floor((a+11*h+22*l)/451),mo=Math.floor((h+l-7*m+114)/31),da=((h+l-7*m+114)%31)+1;return new Date(y,mo-1,da)}
+function adventStart(y){const xmas=new Date(y,11,25);return new Date(y,11,25-(xmas.getDay()||7)-21)}
+function mysteriesFor(date){
+  const t=new Date(date.getFullYear(),date.getMonth(),date.getDate()),y=t.getFullYear();
+  const easter=easterDate(y),ash=new Date(y,easter.getMonth(),easter.getDate()-46),advent=adventStart(y);
+  const wd=t.getDay(),names=["Sunday","Monday","Tuesday","Wednesday","Thursday","Friday","Saturday"];
+  if(t>=ash&&t<easter)return{set:"Sorrowful",why:"said daily during Lent",whyLa:"cotidie tempore Quadragesimae dicuntur"};
+  if(wd===0){
+    if(t>=advent)return{set:"Joyful",why:"said on the Sundays of Advent and Christmas",whyLa:"Dominicis Adventus et Nativitatis dicuntur"};
+    if(t<ash)return{set:"Joyful",why:"said on Sundays from Epiphany until Lent",whyLa:"Dominicis ab Epiphania usque ad Quadragesimam dicuntur"};
+    return{set:"Glorious",why:"said on Sundays from Easter until Advent",whyLa:"Dominicis a Paschate usque ad Adventum dicuntur"};
+  }
+  const set=["","Joyful","Sorrowful","Glorious","Luminous","Sorrowful","Joyful"][wd];
+  return{set,why:"said on "+names[wd]+"s",whyLa:["","feria secunda","feria tertia","feria quarta","feria quinta","feria sexta","sabbato"][wd]+" dicuntur"};
+}
+
+/* ----- 54-Day Rosary Novena offerings (common traditional text; check against your booklet) -----
+   Before the Rosary: the Crown of Roses offering. After it: the Spiritual Communion and closing offering.
+   Days 1–27 are said in petition, Days 28–54 in thanksgiving.
+   Mysteries rotate Joyful, Sorrowful, Glorious from Day 1. */
+const NOVENA = {
+  en: {
+    crownOpen: {
+      petition: "Hail, Queen of the Most Holy Rosary, my Mother Mary, hail! At thy feet I humbly kneel to offer thee a Crown of Roses,",
+      thanksgiving: "Hail, Queen of the Most Holy Rosary, my Mother Mary, hail! At thy feet I gratefully kneel to offer thee a Crown of Roses,"
+    },
+    roses: {
+      Joyful: "snow-white buds to remind thee of thy joys, each bud recalling to thee a holy mystery,",
+      Sorrowful: "blood-red roses to remind thee of the passion of thy divine Son, with whom thou didst so completely share each bitter woe, each rose recalling to thee a holy mystery,",
+      Glorious: "full-blown white roses, tinged with the red of the passion, to remind thee of thy glories, fruits of the sufferings of thy Son and thee, each rose recalling to thee a holy mystery,"
+    },
+    bound: {
+      petition: "each ten bound together with my petition for a particular grace.",
+      thanksgiving: "each ten bound together with my heartfelt thanks for the favor thou hast so graciously obtained for me."
+    },
+    crownClose: {
+      petition: "O Holy Queen, dispenser of God’s graces, and Mother of all who invoke thee! Thou canst not look upon my gift and fail to see its binding. As thou receivest my gift, so wilt thou receive my petition; from thy bounty thou wilt give me the favor I so earnestly and trustingly seek. I despair of nothing that I ask of thee. Show thyself my Mother!",
+      thanksgiving: "O Holy Queen, dispenser of God’s graces, and Mother of all who invoke thee! Thou canst not look upon my gift and fail to see its binding. As thou receivest my gift, so wilt thou receive my thanks; from thy bounty thou hast given me the favor I so earnestly and trustingly sought. I despaired of nothing that I asked of thee. Thou hast shown thyself my Mother!"
+    },
+    spiritualCommunion: "My Jesus, I believe that Thou art truly present in the Most Holy Sacrament. I love Thee above all things, and I desire to possess Thee within my soul. Since I am unable now to receive Thee sacramentally, come at least spiritually into my heart. I embrace Thee as being already there, and unite myself wholly to Thee; never permit me to be separated from Thee. Amen.",
+    // the intention is placed between the two parts
+    sweetMother: {
+      petition: ["Sweet Mother Mary, I offer thee this Spiritual Communion to bind my bouquet in a wreath to place upon thy brow. O my Mother, look with favor upon my gift, and in thy love obtain for me", "."],
+      thanksgiving: ["Sweet Mother Mary, I offer thee this Spiritual Communion to bind my bouquet in a wreath to place upon thy brow, in gratitude for", ", which thou in thy love hast obtained for me."]
+    },
+    noRequest: "(here mention your request)"
+  },
+  la: {
+    crownOpen: {
+      petition: "Ave, Regina sacratissimi Rosarii, Mater mea Maria, ave! Ad pedes tuos humiliter procumbo, ut tibi coronam rosarum offeram:",
+      thanksgiving: "Ave, Regina sacratissimi Rosarii, Mater mea Maria, ave! Ad pedes tuos grato animo procumbo, ut tibi coronam rosarum offeram:"
+    },
+    roses: {
+      Joyful: "gemmas niveas, quae gaudia tua tibi in memoriam revocent, singulas sanctum mysterium tibi recolentes,",
+      Sorrowful: "rosas sanguineas, quae passionem divini Filii tui tibi in memoriam revocent, cuius singulos acerbos dolores tam plene participasti, singulas sanctum mysterium tibi recolentes,",
+      Glorious: "rosas albas plene apertas, rubore passionis tinctas, quae gloriam tuam tibi in memoriam revocent, fructum dolorum Filii tui et tuorum, singulas sanctum mysterium tibi recolentes,"
+    },
+    bound: {
+      petition: "denas quasque cum petitione mea pro gratia peculiari colligatas.",
+      thanksgiving: "denas quasque cum gratiarum actione mea ex corde pro beneficio, quod mihi tam benigne impetrasti, colligatas."
+    },
+    crownClose: {
+      petition: "O sancta Regina, gratiarum Dei dispensatrix, et Mater omnium qui te invocant! Non potes donum meum aspicere quin vinculum eius videas. Sicut donum meum suscipis, ita et petitionem meam suscipies; ex largitate tua gratiam mihi dabis, quam tam ardenter et fidenter quaero. De nulla re despero quam a te peto. Monstra te esse Matrem!",
+      thanksgiving: "O sancta Regina, gratiarum Dei dispensatrix, et Mater omnium qui te invocant! Non potes donum meum aspicere quin vinculum eius videas. Sicut donum meum suscipis, ita et gratias meas suscipies; ex largitate tua gratiam mihi dedisti, quam tam ardenter et fidenter quaesivi. De nulla re desperavi quam a te petivi. Monstrasti te esse Matrem!"
+    },
+    spiritualCommunion: "Iesu mi, credo te in sanctissimo Sacramento vere praesentem esse. Amo te super omnia, teque in anima mea habere desidero. Quoniam nunc sacramentaliter te suscipere non possum, veni saltem spiritualiter in cor meum. Tamquam iam praesentem amplector te, et totum me tibi coniungo; ne permittas me umquam a te separari. Amen.",
+    sweetMother: {
+      petition: ["Dulcis Mater Maria, offero tibi hanc Communionem spiritualem, ut fasciculum meum in sertum colligam, quod fronti tuae imponam. O Mater mea, donum meum benigne respice, et pro amore tuo impetra mihi", "."],
+      thanksgiving: ["Dulcis Mater Maria, offero tibi hanc Communionem spiritualem, ut fasciculum meum in sertum colligam, quod fronti tuae imponam, in gratiarum actionem pro", ", quod mihi amore tuo impetrasti."]
+    },
+    noRequest: "(hic petitionem tuam commemora)"
+  }
+};
+/* ===================== end of editable section ===================== */
+
+const APP_VERSION="1";
+const REQUIRE_PIN=true; // the blank copy sets this to false: no PIN until you choose one
+const LS_KEY="rosegarden-data", THEME_KEY="rosegarden-theme", PIN_KEY="rosegarden-pin";
+const $=id=>document.getElementById(id);
+const esc=s=>String(s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+const uidGen=()=>Date.now().toString(36)+Math.random().toString(36).slice(2,7);
+const SETS=["Joyful","Sorrowful","Glorious","Luminous"], NOV_SETS=["Joyful","Sorrowful","Glorious"];
+const NOV_DAYS=54, NOV_HALF=27, HM_PER_ROSARY=53;   // 3 opening Hail Marys + 50 in the decades
+
+function blankState(){return{v:1,rosaries:[],reflections:{},intention:"",journal:[],novenas:[],currentNovenaId:null,badges:{},updatedAt:0}}
+let state=blankState();
+try{const raw=localStorage.getItem(LS_KEY);if(raw){const s=JSON.parse(raw);if(s&&Array.isArray(s.rosaries))state=Object.assign(blankState(),s);}}catch(e){}
+
+/* ---------- dates: a day runs midnight to midnight on this phone's clock ---------- */
+const pad=n=>String(n).padStart(2,"0");
+const dk=d=>{const x=new Date(d);return x.getFullYear()+"-"+pad(x.getMonth()+1)+"-"+pad(x.getDate())};
+const fromDk=k=>{const [y,m,d]=k.split("-").map(Number);return new Date(y,m-1,d)};
+const addDays=(k,n)=>{const d=fromDk(k);d.setDate(d.getDate()+n);return dk(d)};
+const todayK=()=>dk(new Date());
+const daysBetween=(a,b)=>Math.round((fromDk(b)-fromDk(a))/86400000);
+const fmtDate=iso=>new Date(iso).toLocaleDateString(undefined,{weekday:"short",month:"short",day:"numeric",year:"numeric"});
+const fmtLong=d=>new Date(d).toLocaleDateString(undefined,{weekday:"long",month:"long",day:"numeric"});
+const fmtShort=iso=>new Date(iso).toLocaleDateString(undefined,{month:"short",day:"numeric"});
+const fmtTime=iso=>new Date(iso).toLocaleTimeString(undefined,{hour:"numeric",minute:"2-digit"});
+const num=n=>n.toLocaleString();
+
+function save(){
+  state.updatedAt=Date.now();
+  try{localStorage.setItem(LS_KEY,JSON.stringify(state))}catch(e){}
+}
+
+/* ---------- Rosaries ---------- */
+function byDay(){const m={};for(const r of state.rosaries)(m[r.day]=m[r.day]||[]).push(r);for(const k in m)m[k].sort((a,b)=>a.at<b.at?-1:1);return m}
+function sortedRosaries(){return [...state.rosaries].sort((a,b)=>a.at<b.at?-1:1)}
+function addRosary(o){
+  const at=o.at||new Date().toISOString();
+  const r={id:uidGen(),at,day:dk(at),set:o.set,lang:o.lang||"en",src:o.src||"mark"};
+  state.rosaries.push(r);save();render();evalBadges(true);return r;
+}
+function removeRosary(id){state.rosaries=state.rosaries.filter(r=>r.id!==id);save();render();evalBadges(false)}
+function stats(){
+  const m=byDay(),days=Object.keys(m).sort(),t=todayK();
+  let longest=0,run=0,prev=null;
+  for(const k of days){run=(prev&&addDays(prev,1)===k)?run+1:1;longest=Math.max(longest,run);prev=k}
+  let k=m[t]?t:(m[addDays(t,-1)]?addDays(t,-1):null),cur=0;
+  while(k&&m[k]){cur++;k=addDays(k,-1)}
+  const sets={};SETS.forEach(s=>sets[s]=0);state.rosaries.forEach(r=>{if(r.set in sets)sets[r.set]++});
+  return{m,days,today:(m[t]||[]).length,cur,longest,total:state.rosaries.length,hm:state.rosaries.length*HM_PER_ROSARY,sets};
+}
+const setName=(s,la)=>la?`Mysteria ${SET_LA[s]}`:`${s} Mysteries`;
+
+/* ---------- shared rose icon (the same rose used for the Hail Marys) ---------- */
+function roseIcon(){
+  let o="",n="";for(let k=0;k<5;k++)o+=`<ellipse class="hp-o" cx="0" cy="-11" rx="11" ry="13" transform="rotate(${k*72})"/>`;
+  for(let k=0;k<5;k++)n+=`<ellipse class="hp-i" cx="0" cy="-6" rx="6.5" ry="8.5" transform="rotate(${k*72+36})"/>`;
+  return o+n+`<path class="hp-c" d="M0,-3 C4,-3 4,3 0,3 C-5,3 -5,-5 1,-6 C7,-6 8,4 1,7"/>`;
+}
+const STAR_PTS="0.00,-7.50 1.88,-2.59 7.13,-2.32 3.04,0.99 4.41,6.07 0.00,3.20 -4.41,6.07 -3.04,0.99 -7.13,-2.32 -1.88,-2.59";
+const starSvg=cls=>`<svg class="${cls}" viewBox="-8 -8 16 16" aria-hidden="true"><polygon class="refl-star" points="${STAR_PTS}"/></svg>`;
+
+/* ---------- today card (daily mode) ---------- */
+function drawToday(st){
+  const now=new Date(),ms=mysteriesFor(now),t=todayK(),list=st.m[t]||[];
+  const roses=list.length?list.map(()=>`<svg viewBox="-26 -26 52 52" aria-hidden="true">${roseIcon()}</svg>`).join(""):`<span class="empty"><svg viewBox="-26 -26 52 52" aria-hidden="true">${roseIcon()}</svg></span>`;
+  const cnt=list.length===0?"No Rosary yet today":list.length===1?"1 Rosary prayed today":`${list.length} Rosaries prayed today`;
+  const hasRefl=!!(state.reflections[t]&&state.reflections[t].text);
+  $("todayCard").innerHTML=`<span class="label">Today · ${esc(fmtLong(now))}</span>
+    <p class="today-set">${ms.set} Mysteries</p><p class="today-why">${esc(ms.why.charAt(0).toUpperCase()+ms.why.slice(1))}</p>
+    <div class="today-count"><span class="roses">${roses}</span><span class="count-text">${cnt}</span></div>
+    <div class="actions"><button class="btn primary" id="prayBtn">Pray the Rosary</button><button class="btn gold" id="markBtn">${list.length?"Mark another Rosary prayed":"Mark today’s Rosary prayed"}</button></div>
+    <div class="link-row">${list.length?`<button class="link-btn" id="unmarkBtn" style="color:var(--rose)">Unmark today’s Rosary</button>`:""}<button class="link-btn" id="todayReflBtn">${hasRefl?"View today’s reflection":"Write a reflection"}</button><button class="link-btn" id="todayDayBtn">See today</button></div>`;
+  $("prayBtn").onclick=()=>openPrayers({kind:"daily"});
+  $("markBtn").onclick=()=>openMark(t);
+  if($("unmarkBtn"))$("unmarkBtn").onclick=()=>{const last=list[list.length-1];
+    confirmBox("Unmark today’s Rosary?",`This removes the Rosary ${last.src==="app"?"prayed":"marked"} at ${fmtTime(last.at)} (${last.set} Mysteries) from your history.`,"Unmark",()=>{removeRosary(last.id);toast("Rosary unmarked")})};
+  $("todayReflBtn").onclick=()=>openRefl({kind:"day",k:t});
+  $("todayDayBtn").onclick=()=>openCalDay(t);
+}
+
+/* ---------- intention card (daily mode) ---------- */
+let editing=false;
+function drawIntent(){
+  const c=$("intentCard");
+  if(editing){
+    c.innerHTML=`<label class="label" for="editIntent">Your intention for the Rosary</label><textarea id="editIntent" placeholder="Someone or something to pray for…">${esc(state.intention||"")}</textarea>
+      <div class="intent-row"><span class="meta">Said in the Prayer Before the Rosary</span><span><button class="link-btn" id="editCancel">Cancel</button> <button class="link-btn" id="editSave">Save</button></span></div>`;
+    $("editIntent").focus();
+    $("editCancel").onclick=()=>{editing=false;drawIntent()};
+    $("editSave").onclick=()=>{state.intention=$("editIntent").value.trim();editing=false;save();render();toast("Intention saved")};
+    return;
+  }
+  c.innerHTML=`<span class="label">Praying for</span>
+    <p class="intent-text${state.intention?"":" empty"}">${state.intention?esc(state.intention):"No intention written yet."}</p>
+    <div class="intent-row"><button class="link-btn" id="pickJBtn">From your journal</button><button class="link-btn" id="editBtn">${state.intention?"Edit intention":"Add an intention"}</button></div>`;
+  $("editBtn").onclick=()=>{editing=true;drawIntent()};
+  $("pickJBtn").onclick=()=>{jEdit=null;jDel=null;drawJournal();show("journalOverlay")};
+}
+
+/* ---------- gentle notes ---------- */
+function drawDailyNote(st){
+  const el=$("dailyNote"),t=todayK();el.hidden=true;
+  if(st.today||!st.days.length)return;
+  const last=st.days[st.days.length-1],gap=daysBetween(last,t);
+  if(gap===1&&st.cur>=2){el.textContent=`You’ve prayed ${st.cur} days in a row. Today is still open whenever you’re ready.`;el.hidden=false}
+  else if(gap>=2){el.textContent=`Your last Rosary was on ${fmtLong(fromDk(last))}. Missed days happen to everyone; Our Lady is glad whenever you return. Pray today whenever you’re ready.`;el.hidden=false}
+}
+
+/* ---------- stats ---------- */
+function drawStats(st){
+  const box=(n,l,hl)=>`<div class="stat${hl?" hl":""}"><b>${num(n)}</b><span>${l}</span></div>`;
+  $("stats").innerHTML=box(st.today,"Today",true)+box(st.cur,st.cur===1?"Day in a row":"Days in a row")+box(st.longest,"Longest streak")+
+    box(st.total,st.total===1?"Rosary in all":"Rosaries in all")+box(st.hm,"Hail Marys")+box(Object.values(state.reflections).filter(r=>r&&r.text).length,"Reflections");
+  $("setCounts").innerHTML=SETS.map(s=>`<div><b>${num(st.sets[s])}</b><span>${s}</span></div>`).join("");
+}
+
+/* ---------- calendar ---------- */
+let calMonth=null;
+function drawCal(st){
+  const now=new Date();if(!calMonth)calMonth={y:now.getFullYear(),m:now.getMonth()};
+  const {y,m}=calMonth,days=new Date(y,m+1,0).getDate(),lead=new Date(y,m,1).getDay(),t=todayK();
+  const first=st.days[0]?fromDk(st.days[0]):now,minM=Math.min(first.getFullYear()*12+first.getMonth(),now.getFullYear()*12+now.getMonth()-12);
+  const idx=y*12+m,maxM=now.getFullYear()*12+now.getMonth();
+  const title=new Date(y,m,1).toLocaleDateString(undefined,{month:"long",year:"numeric"});
+  let cells=["S","M","T","W","T","F","S"].map((w,i)=>`<div class="cal-wd" aria-hidden="true">${w}</div>`).join("");
+  for(let i=0;i<lead;i++)cells+=`<div></div>`;
+  let prayed=0;
+  for(let d=1;d<=days;d++){
+    const k=`${y}-${pad(m+1)}-${pad(d)}`,n=(st.m[k]||[]).length,fut=k>t,refl=state.reflections[k]&&state.reflections[k].text;
+    if(n)prayed++;
+    const cls=["cal-d",n>=2?"p2":n?"p1":"",k===t?"today":"",fut?"future":""].join(" ");
+    const lbl=fromDk(k).toLocaleDateString(undefined,{weekday:"long",month:"long",day:"numeric"})+(n?`, ${n} ${n===1?"Rosary":"Rosaries"}`:", no Rosary")+(refl?", has a reflection":"");
+    cells+=`<button class="${cls}" data-k="${k}" ${fut?"disabled":""} aria-label="${esc(lbl)}">${d}${refl?starSvg("st"):""}</button>`;
+  }
+  $("calCard").innerHTML=`<div class="cal-head"><button class="cal-nav" id="calPrev" aria-label="Previous month" ${idx<=minM?"disabled":""}>‹</button><h2>${esc(title)}</h2><button class="cal-nav" id="calNext" aria-label="Next month" ${idx>=maxM?"disabled":""}>›</button></div>
+    <div class="cal-grid">${cells}</div>
+    <div class="cal-legend"><span><i style="background:var(--rose-soft)"></i>1 Rosary</span><span><i style="background:var(--rose)"></i>2 or more</span><span>${starSvg("")?`<svg width="12" height="12" viewBox="-8 -8 16 16" aria-hidden="true" style="vertical-align:-1px;margin-right:4px"><polygon class="refl-star" points="${STAR_PTS}"/></svg>`:""}Reflection</span><span style="margin-left:auto">${prayed} ${prayed===1?"day":"days"} prayed</span></div>`;
+  $("calPrev").onclick=()=>{const i=idx-1;calMonth={y:Math.floor(i/12),m:i%12};drawCal(stats())};
+  $("calNext").onclick=()=>{const i=idx+1;calMonth={y:Math.floor(i/12),m:i%12};drawCal(stats())};
+}
+$("calCard").addEventListener("click",e=>{const b=e.target.closest(".cal-d");if(b&&!b.disabled)openCalDay(b.dataset.k)});
+
+let calDayK=null;
+function openCalDay(k){calDayK=k;drawCalDay();show("calDayOverlay")}
+function drawCalDay(){
+  const k=calDayK,list=(byDay()[k]||[]),t=todayK();
+  $("calDayTitle").textContent=k===t?`Today, ${fmtShort(fromDk(k))}`:fmtLong(fromDk(k));
+  $("calDayMeta").textContent=list.length?`${list.length} ${list.length===1?"Rosary":"Rosaries"} prayed`:(k===t?"No Rosary yet today.":"No Rosary was marked this day.");
+  $("calDayList").innerHTML=list.map(r=>`<li><div><div class="r-main">${esc(r.set)} Mysteries</div><div class="r-sub">${fmtTime(r.at)} · ${r.src==="app"?"prayed here":"marked from a rosary"}${r.lang==="la"?" · in Latin":""}</div></div><button class="link-btn" data-rid="${r.id}" style="color:var(--rose)">Unmark</button></li>`).join("");
+  $("calDayList").hidden=!list.length;
+  const r=state.reflections[k];
+  $("calDayRefl").hidden=!(r&&r.text);if(r&&r.text)$("calDayReflText").textContent=r.text;
+  $("calDayReflBtn").textContent=r&&r.text?"View or edit reflection":"Add reflection";
+  $("calDayAdd").textContent=k===t?(list.length?"Mark another Rosary prayed":"Mark today’s Rosary prayed"):"I prayed a Rosary this day";
+}
+$("calDayList").addEventListener("click",e=>{const b=e.target.closest("[data-rid]");if(!b)return;const r=state.rosaries.find(x=>x.id===b.dataset.rid);if(!r)return;
+  hide("calDayOverlay");
+  confirmBox("Unmark this Rosary?",`${r.set} Mysteries, ${fmtDate(r.at)} at ${fmtTime(r.at)}. It will be removed from your history.`,"Unmark",()=>{removeRosary(r.id);toast("Rosary unmarked");drawCalDay();show("calDayOverlay")},()=>{show("calDayOverlay")})});
+$("calDayClose").onclick=()=>hide("calDayOverlay");
+$("calDayReflBtn").onclick=()=>{hide("calDayOverlay");openRefl({kind:"day",k:calDayK,back:"calDayOverlay"})};
+$("calDayAdd").onclick=()=>{hide("calDayOverlay");openMark(calDayK)};
+
+/* ---------- mark a Rosary prayed (from a real rosary) ---------- */
+let markK=null;
+function openMark(k){
+  markK=k;const d=fromDk(k),sug=mysteriesFor(d).set,t=todayK();
+  $("markTitle").textContent=k===t?"Mark today’s Rosary prayed":"Mark a Rosary prayed";
+  $("markMeta").textContent=k===t?`For today, ${fmtLong(new Date())}. Use this when you pray from your own rosary.`:`For ${fmtLong(d)}.`;
+  $("markSet").innerHTML=SETS.map(s=>`<option value="${s}"${s===sug?" selected":""}>${s} Mysteries${s===sug?(k===t?" (today)":" (that day)"):""}</option>`).join("");
+  $("markLatin").checked=lang==="la";
+  show("markOverlay");
+}
+$("markCancel").onclick=()=>hide("markOverlay");
+$("markGo").onclick=()=>{
+  const t=todayK();let at;
+  if(markK===t)at=new Date().toISOString();else{const d=fromDk(markK);d.setHours(12,0,0,0);at=d.toISOString()}
+  hide("markOverlay");
+  const n=(byDay()[markK]||[]).length+1;
+  addRosary({at,set:$("markSet").value,lang:$("markLatin").checked?"la":"en",src:"mark"});
+  toast(markK===t?(n===1?"Today’s Rosary is marked. God bless you.":`Rosary ${n} for today is marked. God bless you.`):`Rosary marked for ${fmtShort(fromDk(markK))}`);
+};
+
+/* ---------- confirm box ---------- */
+let confirmCb=null,confirmCancelCb=null;
+function confirmBox(title,text,yes,cb,cancelCb){$("confirmTitle").textContent=title;$("confirmText").textContent=text;$("confirmYes").textContent=yes;confirmCb=cb;confirmCancelCb=cancelCb||null;show("confirmOverlay")}
+$("confirmNo").onclick=()=>{hide("confirmOverlay");const c=confirmCancelCb;confirmCb=confirmCancelCb=null;if(c)c()};
+$("confirmYes").onclick=()=>{hide("confirmOverlay");const c=confirmCb;confirmCb=confirmCancelCb=null;if(c)c()};
+
+/* ---------- reflections (a day of the daily Rosary, or a day of the novena) ---------- */
+let reflCtx=null,reflDelArmed=false;
+function reflGet(c){
+  if(c.kind==="day")return state.reflections[c.k]&&state.reflections[c.k].text?state.reflections[c.k]:null;
+  const n=curNov();return n&&Array.isArray(n.reflections)&&n.reflections[c.i]&&n.reflections[c.i].text?n.reflections[c.i]:null;
+}
+function reflSet(c,v){
+  if(c.kind==="day"){if(v)state.reflections[c.k]=v;else delete state.reflections[c.k];return}
+  const n=curNov();if(!n)return;if(!Array.isArray(n.reflections))n.reflections=Array(NOV_DAYS).fill(null);n.reflections[c.i]=v;
+}
+function openRefl(c){
+  reflCtx=c;const r=reflGet(c);
+  if(c.kind==="day"){$("reflTitle").textContent=c.k===todayK()?"Today’s reflection":`Reflection for ${fmtShort(fromDk(c.k))}`;
+    $("reflMeta").textContent=(state.intention?`Praying for: ${state.intention}`:"")+(r?`${state.intention?" · ":""}Last saved ${fmtShort(r.updatedAt)}`:"");}
+  else{const n=curNov();$("reflTitle").textContent=`Day ${c.i+1} reflection`;
+    $("reflMeta").textContent=(n&&n.intention?`Praying for: ${n.intention}`:"")+(r?`${n&&n.intention?" · ":""}Last saved ${fmtShort(r.updatedAt)}`:"");}
+  $("reflText").value=r?r.text:"";reflDelArmed=false;$("reflDelete").textContent="Delete reflection";$("reflDelete").hidden=!r;
+  show("reflOverlay");setTimeout(()=>$("reflText").focus(),50);
+}
+function reflBack(){const b=reflCtx&&reflCtx.back;if(b==="calDayOverlay"){drawCalDay();show(b)}else if(b==="novDayOverlay"){drawNovDayRefl();show(b)}}
+$("reflCancel").onclick=()=>{hide("reflOverlay");reflBack()};
+$("reflSave").onclick=()=>{
+  const t=$("reflText").value.trim();
+  reflSet(reflCtx,t?{text:t,updatedAt:new Date().toISOString()}:null);
+  save();render();hide("reflOverlay");toast(t?"Reflection saved":"Reflection removed");evalBadges(true);reflBack();
+};
+$("reflDelete").onclick=()=>{
+  if(!reflDelArmed){reflDelArmed=true;$("reflDelete").textContent="Tap again to delete this reflection";return}
+  reflSet(reflCtx,null);save();render();hide("reflOverlay");toast("Reflection deleted");evalBadges(false);reflBack();
+};
+
+/* =====================================================================
+   54-Day Rosary Novena
+   ===================================================================== */
+function curNov(){return state.novenas.find(n=>n.id===state.currentNovenaId)||null}
+function novCount(n){return n?n.days.filter(Boolean).length:0}
+function novNext(n){if(!n)return 1;const i=n.days.findIndex(d=>!d);return i<0?null:i+1}
+const novSet=d=>NOV_SETS[(d-1)%3];
+const novPhase=d=>d<=NOV_HALF?"petition":"thanksgiving";
+const phaseName=(d,la)=>novPhase(d)==="petition"?(la?"Petitio":"Petition"):(la?"Gratiarum actio":"Thanksgiving");
+function novRefl(n,i){return n&&Array.isArray(n.reflections)&&n.reflections[i]&&n.reflections[i].text?n.reflections[i]:null}
+
+function drawNovCard(){
+  const n=curNov(),c=$("novCard");
+  if(!n){c.innerHTML=`<span class="label">54-Day Rosary Novena</span><p class="nov-status">Twenty-seven days in petition, twenty-seven in thanksgiving.</p>
+    <p class="today-why" style="font-style:normal">One Rosary each day for 54 days, with the mysteries in turn: Joyful, Sorrowful, Glorious. Begin with the intention you are bringing to Our Lady.</p>
+    <div><button class="btn primary" id="novStartBtn" style="width:100%">Begin a 54-Day Novena</button></div>`;
+    $("novStartBtn").onclick=()=>openNew();return}
+  const nd=novNext(n),cnt=novCount(n);
+  if(editing){
+    c.innerHTML=`<label class="label" for="editNovIntent">Your novena intention</label><textarea id="editNovIntent">${esc(n.intention||"")}</textarea>
+      <div class="intent-row"><span class="meta">Began ${fmtDate(n.start)}</span><span><button class="link-btn" id="editCancel">Cancel</button> <button class="link-btn" id="editSave">Save</button></span></div>`;
+    $("editNovIntent").focus();
+    $("editCancel").onclick=()=>{editing=false;drawNovCard()};
+    $("editSave").onclick=()=>{n.intention=$("editNovIntent").value.trim();editing=false;save();render();toast("Intention saved")};
+    return;
+  }
+  const status=nd===null?`All 54 days complete`:`Day ${nd} of 54 · ${phaseName(nd)}`;
+  const sub=nd===null?`Finished ${fmtDate(n.completedAt||n.days[53])}. Thanks be to God.`:`Today’s Rosary: the ${novSet(nd)} Mysteries${nd===NOV_HALF+1?" · thanksgiving begins today":""}`;
+  c.innerHTML=`<span class="label">Praying for</span>
+    <p class="intent-text${n.intention?"":" empty"}">${n.intention?esc(n.intention):"No intention written yet."}</p>
+    <p class="nov-status">${status}</p><p class="today-why">${esc(sub)}</p>
+    <div class="intent-row"><span class="meta">Began ${fmtDate(n.start)} · ${cnt} of 54 prayed</span><button class="link-btn" id="editBtn">Edit intention</button></div>`;
+  $("editBtn").onclick=()=>{editing=true;drawNovCard()};
+}
+function drawNovTrack(){
+  const n=curNov(),nd=novNext(n),t=$("novTrack");
+  const half=(from,title)=>{let h="";
+    for(let d=from;d<from+NOV_HALF;d++){
+      const done=n&&n.days[d-1],refl=!!(done&&novRefl(n,d-1)),next=n&&nd===d;
+      const cls=["nb",done?"on":"",done&&novCount(n)===NOV_DAYS?"gold":"",next?"next":""].join(" ");
+      const lbl=`Day ${d}, ${novSet(d)} Mysteries, ${done?`prayed ${fmtDate(done)}${refl?", has a reflection":""}`:next?"next. Tap to mark prayed":"not yet prayed"}`;
+      h+=`<button class="${cls}" data-d="${d}" aria-label="${esc(lbl)}"><svg viewBox="-26 -26 52 52" aria-hidden="true">${roseIcon()}</svg><span class="nn">${d}</span>${refl?starSvg("st"):""}</button>`;
+    }
+    return `<div class="nov-half"><div class="intent-row"><span class="label">${title}</span><span class="meta">${n?n.days.slice(from-1,from-1+NOV_HALF).filter(Boolean).length:0} of 27</span></div><div class="nov-grid">${h}</div></div>`;};
+  t.innerHTML=half(1,"Petition · Days 1–27")+half(28,"Thanksgiving · Days 28–54")+
+    `<div class="nov-key" style="margin-top:8px"><span>Each row of nine: Joyful, Sorrowful, Glorious, in turn.</span></div>`;
+}
+let novPopupDay=null;
+function onNovBead(d){
+  const n=curNov();if(!n){openNew();return}
+  if(n.days[d-1]){novPopupDay=d;
+    $("novDayTitle").textContent=`Day ${d} prayed`;
+    $("novDayWhen").textContent=`${fmtDate(n.days[d-1])} at ${fmtTime(n.days[d-1])} · ${novSet(d)} Mysteries · ${phaseName(d)}`;
+    $("novDayUnmark").textContent=`Unmark Day ${d}`;drawNovDayRefl();show("novDayOverlay");return}
+  const nd=novNext(n);
+  if(d!==nd){toast(`Day ${nd} comes next`);return}
+  markNovDay(n,d);
+}
+function markNovDay(n,d,quiet){
+  n.days[d-1]=new Date().toISOString();
+  if(novCount(n)===NOV_DAYS)n.completedAt=new Date().toISOString();
+  save();render();
+  if(novCount(n)===NOV_DAYS){celebrate();toast("All 54 days complete. Thanks be to God.")}
+  else if(d===NOV_HALF){toast("Twenty-seven days of petition complete. Thanksgiving begins tomorrow.")}
+  else if(!quiet)toast(`Day ${d} prayed. God bless you.`);
+  evalBadges(true);
+}
+function drawNovDayRefl(){const n=curNov(),r=novRefl(n,novPopupDay-1);
+  $("novDayRefl").hidden=!r;if(r)$("novDayReflText").textContent=r.text;
+  $("novDayRefBtn").textContent=r?"View or edit reflection":"Add reflection";}
+$("novTrack").addEventListener("click",e=>{const b=e.target.closest(".nb");if(b)onNovBead(+b.dataset.d)});
+$("novDayKeep").onclick=()=>hide("novDayOverlay");
+$("novDayUnmark").onclick=()=>{hide("novDayOverlay");const d=novPopupDay;
+  confirmBox(`Unmark Day ${d}?`,`Day ${d} of your 54-Day Novena will show as not yet prayed.`,"Unmark",()=>{const n=curNov();if(n){n.days[d-1]=null;n.completedAt=null;save();render();evalBadges(false);toast(`Day ${d} unmarked`)}},()=>show("novDayOverlay"))};
+$("novDayRefBtn").onclick=()=>{hide("novDayOverlay");openRefl({kind:"nov",i:novPopupDay-1,back:"novDayOverlay"})};
+$("novDayPray").onclick=()=>{hide("novDayOverlay");openPrayers({kind:"nov",day:novPopupDay})};
+
+function drawNovNote(){
+  const n=curNov(),el=$("novNote");el.hidden=true;if(!n)return;const nd=novNext(n);if(nd===null)return;
+  const today=todayK();let last=null;n.days.forEach(d=>{if(d&&(!last||d>last))last=d});
+  const gap=daysBetween(dk(last||n.start),today);
+  if(last&&gap>=2){el.textContent=`It has been ${gap} days since your last day of the novena. That’s all right. Pick up with Day ${nd} whenever you’re ready.`;el.hidden=false}
+  else if(!last&&gap>=2){el.textContent=`You began this novena on ${fmtShort(n.start)}. Day 1 is still waiting for you whenever you’re ready.`;el.hidden=false}
+}
+function drawNovHist(){
+  const list=[...state.novenas].sort((a,b)=>(b.createdAt||0)-(a.createdAt||0)),h=$("novHist");
+  if(!list.length){h.innerHTML=`<li class="empty-hist">54-Day Novenas you begin will be listed here, with their intentions and dates.</li>`;return}
+  h.innerHTML=list.map(n=>{
+    const c=novCount(n),complete=c===NOV_DAYS,isCur=n.id===state.currentNovenaId;
+    const dates=complete?`Began ${fmtShort(n.start)} · Finished ${fmtShort(n.completedAt||n.days[53])}`:`Began ${fmtShort(n.start)} · ${c} of 54 days`;
+    const chip=isCur?`<span class="chip">Current</span>`:complete?`<span class="chip done">Complete</span>`:`<span class="chip">In progress</span>`;
+    const btn=isCur?"":`<button class="link-btn" data-open="${n.id}">${complete?"View":"Resume"}</button>`;
+    return `<li class="hist-item"><div class="hist-body">${chip}<p class="hist-intent">${n.intention?esc(n.intention):"<span style='opacity:.6'>No intention written</span>"}</p><div class="bar"><i style="width:${(c/NOV_DAYS*100).toFixed(1)}%"></i></div><div class="meta">${dates}</div></div>${btn}</li>`;
+  }).join("");
+}
+$("novHist").addEventListener("click",e=>{const b=e.target.closest("[data-open]");if(!b)return;state.currentNovenaId=b.dataset.open;editing=false;save();render();window.scrollTo({top:0,behavior:"smooth"})});
+$("novPrayBtn").onclick=()=>{const n=curNov();if(!n){openNew();return}openPrayers({kind:"nov",day:novNext(n)||NOV_DAYS})};
+
+let pickedJournal=null;
+function drawNewPick(){
+  const open=journal().filter(j=>!j.usedIn);
+  $("newPick").innerHTML=open.length?`<div class="j-head">From your journal</div><div class="pick-chips">${open.map(j=>`<button type="button" data-jid="${j.id}" class="${j.id===pickedJournal?"sel":""}" aria-pressed="${j.id===pickedJournal}">${esc(j.text)}</button>`).join("")}</div>`:"";
+}
+function openNew(text,jid){
+  const n=curNov();
+  $("newMeta").textContent=`Starting ${fmtDate(new Date())}. Day 1 is the Joyful Mysteries.`+(n&&novNext(n)!==null?` Your current novena (${novCount(n)} of 54 days) will stay in your list so you can resume it.`:"");
+  pickedJournal=jid||null;$("newIntent").value=typeof text==="string"?text:"";drawNewPick();show("newOverlay");setTimeout(()=>$("newIntent").focus(),50);
+}
+$("novNewBtn").onclick=()=>openNew();
+$("newPick").addEventListener("click",e=>{const b=e.target.closest("[data-jid]");if(!b)return;const j=journal().find(x=>x.id===b.dataset.jid);if(!j)return;
+  if(pickedJournal===j.id){pickedJournal=null;$("newIntent").value=""}else{pickedJournal=j.id;$("newIntent").value=j.text}drawNewPick()});
+$("newCancel").onclick=()=>hide("newOverlay");
+$("newGo").onclick=()=>{
+  const now=new Date().toISOString();
+  const n={id:uidGen(),intention:$("newIntent").value.trim(),start:now,createdAt:Date.now(),days:Array(NOV_DAYS).fill(null),reflections:Array(NOV_DAYS).fill(null),completedAt:null};
+  const pj=pickedJournal&&journal().find(x=>x.id===pickedJournal);if(pj){pj.usedIn=n.id;pj.usedAt=now}pickedJournal=null;
+  state.novenas.push(n);state.currentNovenaId=n.id;editing=false;save();hide("newOverlay");setMode("novena");render();toast("Novena begun. Tap the first rose when you’ve prayed Day 1.");
+};
+
+/* =====================================================================
+   Achievements
+   ===================================================================== */
+const B=(id,name,hint,icon,label)=>({id,name,hint,icon,label});
+const BADGES=[
+  B("first","First Rosary","Pray your first Rosary","rose"),
+  B("streak3","3 Days in a Row","Pray the Rosary 3 days in a row","crown","3"),
+  B("streak7","7 Days in a Row","Pray the Rosary 7 days in a row","crown","7"),
+  B("streak14","14 Days in a Row","Pray the Rosary 14 days in a row","crown","14"),
+  B("streak30","30 Days in a Row","Pray the Rosary 30 days in a row","crown","30"),
+  B("streak54","54 Days in a Row","Pray the Rosary 54 days in a row, the length of the 54-Day Rosary Novena","crown","54"),
+  B("streak100","100 Days in a Row","Pray the Rosary 100 days in a row","crown","100"),
+  B("streak365","A Year in a Row","Pray the Rosary 365 days in a row","crown","365"),
+  B("total10","10 Rosaries","Pray 10 Rosaries in all","rosary","10"),
+  B("total50","50 Rosaries","Pray 50 Rosaries in all","rosary","50"),
+  B("total100","100 Rosaries","Pray 100 Rosaries in all","rosary","100"),
+  B("total500","500 Rosaries","Pray 500 Rosaries in all","rosary","500"),
+  B("total1000","1,000 Rosaries","Pray 1,000 Rosaries in all","rosary","1000"),
+  B("hm1000","1,000 Hail Marys","Pray 1,000 Hail Marys (about 19 Rosaries)","hm","1,000"),
+  B("hm10000","10,000 Hail Marys","Pray 10,000 Hail Marys (about 189 Rosaries)","hm","10,000"),
+  B("double","Double Garland","Pray two Rosaries in one day","two"),
+  B("psalter","Our Lady’s Psalter","Pray three Rosaries in one day, the 150 Hail Marys of the Psalter","three"),
+  B("allSets","All Four Mysteries","Pray each of the four sets of mysteries","four"),
+  B("weekSets","A Week of Mysteries","Pray all four sets of mysteries within one week","four7"),
+  B("twenty","All Twenty in a Day","Pray all four sets of mysteries in one day","twenty"),
+  B("oct7","Our Lady of the Rosary","Pray a Rosary on October 7","queen"),
+  B("feasts","Feasts of Our Lady","Pray a Rosary on Jan 1, Mar 25, Aug 15, Sep 8 and Dec 8","stars12"),
+  B("firstSat","Five First Saturdays","Pray a Rosary on the first Saturday of five months in a row","heart"),
+  B("may","Month of Mary","Pray a Rosary every day of May","wreath","May"),
+  B("october","Month of the Rosary","Pray a Rosary every day of October","wreath","Oct"),
+  B("advent","Advent Watch","Pray a Rosary every day of Advent","candles"),
+  B("lent","Lenten Offering","Pray a Rosary every day of Lent, Ash Wednesday to Holy Saturday","cross"),
+  B("latin","Ave Maria","Pray a Rosary in Latin","latin"),
+  B("refl1","First Reflection","Write your first reflection","star"),
+  B("refl10","10 Reflections","Write 10 reflections","stars3"),
+  B("novHalf","Petition Offered","Finish the 27 days of petition of a 54-Day Novena","rosaryHalf","27"),
+  B("novDone","54-Day Novena","Complete all 54 days of a 54-Day Rosary Novena","rosaryCrown","54")
+];
+function earnedDates(){
+  const R=sortedRosaries(),m=byDay(),days=Object.keys(m).sort(),e={};
+  if(R.length)e.first=R[0].at;
+  // streaks
+  let run=0,prev=null;
+  for(const k of days){run=(prev&&addDays(prev,1)===k)?run+1:1;prev=k;
+    for(const n of [3,7,14,30,54,100,365])if(run===n&&!e["streak"+n])e["streak"+n]=m[k][0].at;}
+  for(const n of [10,50,100,500,1000])if(R.length>=n)e["total"+n]=R[n-1].at;
+  for(const n of [1000,10000]){const i=Math.ceil(n/HM_PER_ROSARY)-1;if(R.length>i)e["hm"+n]=R[i].at}
+  for(const k of days){const l=m[k];if(l.length>=2&&!e.double)e.double=l[1].at;if(l.length>=3&&!e.psalter)e.psalter=l[2].at;
+    if(!e.twenty){const s=new Set();for(const r of l){s.add(r.set);if(s.size===4){e.twenty=r.at;break}}}}
+  {const s=new Set();for(const r of R){s.add(r.set);if(s.size===4){e.allSets=r.at;break}}}
+  for(const k of days){if(e.weekSets)break;const s=new Set();for(let i=6;i>=1;i--)(m[addDays(k,-i)]||[]).forEach(r=>s.add(r.set));
+    for(const r of m[k]){s.add(r.set);if(s.size===4){e.weekSets=r.at;break}}}
+  {const r=R.find(r=>r.day.slice(5)==="10-07");if(r)e.oct7=r.at}
+  {const f=["01-01","03-25","08-15","09-08","12-08"].map(md=>R.find(r=>r.day.slice(5)===md));if(f.every(Boolean))e.feasts=f.map(r=>r.at).sort().pop()}
+  // five first Saturdays in a row
+  {const fs=days.filter(k=>{const d=fromDk(k);return d.getDay()===6&&d.getDate()<=7}).map(k=>{const d=fromDk(k);return{i:d.getFullYear()*12+d.getMonth(),k}});
+    let r=0,p=null;for(const x of fs){r=(p!==null&&x.i===p+1)?r+1:1;p=x.i;if(r===5){e.firstSat=m[x.k][0].at;break}}}
+  // every day of a span
+  const full=(a,b)=>{for(let k=a;k<=b;k=addDays(k,1))if(!m[k])return null;return m[b][0].at};
+  const years=[...new Set(days.map(k=>+k.slice(0,4)))];
+  for(const y of years){
+    if(!e.may){const v=full(`${y}-05-01`,`${y}-05-31`);if(v)e.may=v}
+    if(!e.october){const v=full(`${y}-10-01`,`${y}-10-31`);if(v)e.october=v}
+    if(!e.advent){const v=full(dk(adventStart(y)),`${y}-12-24`);if(v)e.advent=v}
+    if(!e.lent){const ea=easterDate(y),ash=new Date(ea.getFullYear(),ea.getMonth(),ea.getDate()-46),sat=new Date(ea.getFullYear(),ea.getMonth(),ea.getDate()-1);const v=full(dk(ash),dk(sat));if(v)e.lent=v}
+  }
+  {const r=R.find(r=>r.lang==="la");if(r)e.latin=r.at}
+  const refl=[...Object.values(state.reflections),...state.novenas.flatMap(n=>n.reflections||[])].filter(r=>r&&r.text).map(r=>r.updatedAt).sort();
+  if(refl.length)e.refl1=refl[0];if(refl.length>=10)e.refl10=refl[9];
+  const nh=state.novenas.map(n=>n.days.slice(0,NOV_HALF)).filter(d=>d.every(Boolean)).map(d=>[...d].sort().pop()).sort();if(nh.length)e.novHalf=nh[0];
+  const nd=state.novenas.filter(n=>n.days.every(Boolean)).map(n=>[...n.days].sort().pop()).sort();if(nd.length)e.novDone=nd[0];
+  return e;
+}
+function evalBadges(announce){
+  const e=earnedDates(),fresh=[];
+  for(const b of BADGES){
+    if(e[b.id]&&!state.badges[b.id]){state.badges[b.id]=e[b.id];fresh.push(b)}
+    else if(e[b.id]&&state.badges[b.id]!==e[b.id])state.badges[b.id]=e[b.id];
+    else if(!e[b.id]&&state.badges[b.id])delete state.badges[b.id];
+  }
+  save();drawBadges();
+  if(announce&&fresh.length)showBadges(fresh,true);
+}
+
+/* medal icons: drawn in the same style as the decade icons */
+function rosesAt(pts,s){return pts.map(([x,y])=>{let o="",i="";for(let k=0;k<5;k++)o+=`<ellipse class="m-rose" cx="0" cy="-11" rx="11" ry="13" transform="rotate(${k*72})"/>`;
+  for(let k=0;k<5;k++)i+=`<ellipse class="m-rosei" cx="0" cy="-6" rx="6.5" ry="8.5" transform="rotate(${k*72+36})"/>`;
+  return `<g transform="translate(${x},${y}) scale(${s})">${o}${i}<path style="fill:none;stroke:#86203a;stroke-linecap:round;stroke-width:${(1/s).toFixed(2)}" d="M0,-3 C4,-3 4,3 0,3 C-5,3 -5,-5 1,-6 C7,-6 8,4 1,7"/></g>`}).join("")}
+const crownP=(x,y,s)=>`<g transform="translate(${x},${y}) scale(${s})"><path class="m-ink" d="M-16,6 L-12,-10 L-5,0 L0,-14 L5,0 L12,-10 L16,6Z"/><rect class="m-ink" x="-16" y="7" width="32" height="5" rx="1.5"/><circle class="m-rose" cx="0" cy="-15" r="2.6"/></g>`;
+function rosaryP(cy,r,label){let s="";for(let k=0;k<10;k++){const a=(-90+18+k*36)*Math.PI/180;s+=`<circle class="m-ink" cx="${(r*Math.cos(a)).toFixed(1)}" cy="${(cy+r*Math.sin(a)).toFixed(1)}" r="2.6"/>`}
+  s+=`<path class="m-ink" d="M-1.6,${cy+r+1} h3.2 v4 h4 v3 h-4 v6 h-3.2 v-6 h-4 v-3 h4z"/>`;
+  if(label)s+=`<text class="m-txt" x="0" y="${cy+4}" font-size="${label.length>2?10:12}">${label}</text>`;return s}
+const txt=(t,y,fs)=>`<text class="m-txt" x="0" y="${y}" font-size="${fs}">${esc(t)}</text>`;
+const starP=(x,y,s)=>`<polygon class="m-ink" transform="translate(${x},${y}) scale(${s})" points="${STAR_PTS}"/>`;
+const MEDAL_ICON={
+  rose:b=>rosesAt([[0,0]],.95),
+  crown:b=>crownP(0,-7,.9)+txt(b.label,17,b.label.length>2?12:14),
+  rosary:b=>rosaryP(-4,14,b.label.length>3?"1k":b.label),
+  hm:b=>rosesAt([[0,-6]],.62)+txt(b.label,18,b.label.length>5?9:11),
+  two:b=>rosesAt([[-9,0],[9,0]],.5),
+  three:b=>rosesAt([[0,-8],[-9,7],[9,7]],.42),
+  four:b=>rosesAt([[0,-11],[11,0],[0,11],[-11,0]],.36),
+  four7:b=>rosesAt([[0,-12],[12,0],[0,12],[-12,0]],.3)+txt("7",4,12),
+  twenty:b=>rosaryP(-4,14,"XX"),
+  queen:b=>crownP(0,-12,.6)+rosesAt([[0,6]],.6),
+  stars12:b=>{let s="";for(let k=0;k<12;k++){const a=k*30*Math.PI/180;s+=starP((17*Math.cos(a)).toFixed(1),(17*Math.sin(a)).toFixed(1),.42)}return s+rosesAt([[0,0]],.38)},
+  heart:b=>`<path class="m-rose" d="M0,14 C-15,4 -15,-8 -6.5,-8 C-3,-8 -1,-6 0,-4 C1,-6 3,-8 6.5,-8 C15,-8 15,4 0,14Z"/><path class="m-ink" d="M0,-6 C-3.5,-10 -2,-14 0,-18 C2,-14 3.5,-10 0,-6Z"/>`+`<text class="m-txt" x="0" y="6" font-size="10" style="fill:#fff">5</text>`,
+  wreath:b=>{let s="";for(let k=0;k<10;k++){const a=k*36*Math.PI/180;s+=`<ellipse class="m-leaf" cx="${(16*Math.cos(a+.3)).toFixed(1)}" cy="${(16*Math.sin(a+.3)).toFixed(1)}" rx="2" ry="4.2" transform="rotate(${k*36+17+90} ${(16*Math.cos(a+.3)).toFixed(1)} ${(16*Math.sin(a+.3)).toFixed(1)})"/>`}
+    for(let k=0;k<5;k++){const a=(-90+k*72)*Math.PI/180;s+=rosesAt([[+(16*Math.cos(a)).toFixed(1),+(16*Math.sin(a)).toFixed(1)]],.26)}return s+txt(b.label,4,11)},
+  candles:b=>{let s=`<ellipse class="m-leaf" cx="0" cy="12" rx="19" ry="4.5"/>`;[-12,-4,4,12].forEach((x,i)=>{s+=`<rect class="${i===2?"m-rose":"m-ink"}" x="${x-2.5}" y="-6" width="5" height="17" rx="1"/><path class="m-ink" d="M${x},-13 C${x-2.5},-10 ${x-2},-7.5 ${x},-7.5 C${x+2},-7.5 ${x+2.5},-10 ${x},-13Z"/>`});return s},
+  cross:b=>`<circle class="m-inks" r="12" style="stroke-dasharray:2 3"/><path class="m-ink" d="M-2.6,-19 h5.2 v8 h8 v5 h-8 v19 h-5.2 v-19 h-8 v-5 h8z"/>`,
+  latin:b=>txt("AVE",5,15),
+  star:b=>starP(0,0,2.3),
+  stars3:b=>starP(0,-7,1.3)+starP(-9,8,1.1)+starP(9,8,1.1),
+  rosaryHalf:b=>rosesAt([[0,-6]],.62)+txt(b.label,17,12),
+  rosaryCrown:b=>crownP(0,-13,.5)+rosaryP(-1,11,b.label)
+};
+function medalSvg(b,on){
+  return `<svg class="medal${on?"":" locked"}" viewBox="-36 -36 72 72" aria-hidden="true"><circle class="m-bg" r="32"/><circle class="m-ring" r="26.5"/>${MEDAL_ICON[b.icon](b)}${on?"":`<g transform="translate(22,22)"><circle r="9" style="fill:var(--paper)"/><rect class="m-lock" x="-4.5" y="-1" width="9" height="7" rx="1.2"/><path class="m-lock-s" style="stroke-width:1.6" d="M-2.6,-1 v-2.2 a2.6,2.6 0 0 1 5.2,0 v2.2"/></g>`}</svg>`;
+}
+function drawBadges(){
+  const got=BADGES.filter(b=>state.badges[b.id]).length;
+  $("badgeCount").textContent=`${got} of ${BADGES.length} earned`;
+  $("badges").innerHTML=BADGES.map(b=>{const d=state.badges[b.id];
+    return `<button class="badge${d?"":" locked"}" data-b="${b.id}" aria-label="${esc(b.name)}: ${d?`earned ${fmtDate(d)}`:`locked. ${esc(b.hint)}`}">${medalSvg(b,!!d)}<span class="b-name">${esc(b.name)}</span><span class="b-sub">${d?`Earned ${fmtShort(d)}${new Date(d).getFullYear()!==new Date().getFullYear()?", "+new Date(d).getFullYear():""}`:esc(b.hint)}</span></button>`}).join("");
+}
+$("badges").addEventListener("click",e=>{const el=e.target.closest("[data-b]");if(!el)return;const b=BADGES.find(x=>x.id===el.dataset.b);showBadges([b],false)});
+let badgeQueue=[];
+function showBadges(list,fresh){badgeQueue=list.map(b=>({b,fresh}));nextBadge()}
+function nextBadge(){
+  const it=badgeQueue.shift();if(!it){hide("badgeOverlay");return}
+  const {b,fresh}=it,d=state.badges[b.id];
+  $("badgeEyebrow").textContent=fresh?"Achievement unlocked":d?"Achievement":"Not yet earned";
+  $("badgeBig").innerHTML=medalSvg(b,!!d);
+  $("badgeTitle").textContent=b.name;
+  $("badgeText").textContent=d?`${b.hint}. Earned ${fmtDate(d)}.`:`${b.hint}.`;
+  $("badgeOk").textContent=fresh?"Thanks be to God":"Close";
+  show("badgeOverlay");if(fresh)celebrate();
+}
+$("badgeOk").onclick=()=>nextBadge();
+
+/* ---------- render ---------- */
+let mode="daily";try{mode=localStorage.getItem(LS_KEY+"-mode")==="novena"?"novena":"daily"}catch(e){}
+function setMode(m){mode=m;try{localStorage.setItem(LS_KEY+"-mode",m)}catch(e){}editing=false;render()}
+$("modeDaily").onclick=()=>setMode("daily");$("modeNovena").onclick=()=>setMode("novena");
+function render(){
+  document.body.dataset.mode=mode;
+  $("modeDaily").setAttribute("aria-pressed",mode==="daily");$("modeNovena").setAttribute("aria-pressed",mode==="novena");
+  if(mode==="daily"){const st=stats();drawToday(st);drawIntent();drawDailyNote(st);drawStats(st);drawCal(st)}
+  else{drawNovCard();drawNovTrack();drawNovNote();drawNovHist();
+    const n=curNov();$("novPrayBtn").textContent=n&&novNext(n)===null?"Novena Prayers":"Today’s Novena Rosary";}
+  drawBadges();
+}
+
+/* =====================================================================
+   Prayers sheet
+   ===================================================================== */
+let prayCtx={kind:"daily"};
+function para(arr){return (Array.isArray(arr)?arr:[arr]).map(t=>`<p>${esc(t)}</p>`).join("")}
+let lang="en";try{lang=localStorage.getItem(LS_KEY+"-lang")==="la"?"la":"en"}catch(e){}
+const T=(en,la)=>lang==="la"?la:en;
+const SET_LA={Joyful:"Gaudiosa",Sorrowful:"Dolorosa",Glorious:"Gloriosa",Luminous:"Luminosa"};
+const LA_BOOKS=[["1 Corinthians","1 Cor"],["2 Corinthians","2 Cor"],["2 Timothy","2 Tim"],["3 Kings","3 Reg"],["Luke","Lc"],["Matthew","Mt"],["Mark","Mc"],["John","Io"],["Acts","Act"],["Isaias","Is"],["Genesis","Gen"],["Psalm","Ps"],["Canticle","Cant"],["Judith","Iudith"],["Apocalypse","Apoc"],["Ecclesiasticus","Eccli"],["Proverbs","Prov"],["Romans","Rom"],["Galatians","Gal"]];
+function refLa(r){for(const [a,b] of LA_BOOKS)if(r.startsWith(a+" "))return b+" "+r.slice(a.length+1);return r}
+/* Decade counter under each mystery, kept for today only:
+   praying hands on a bead (Our Father), ten roses (Hail Marys), cross (Glory Be), heart (Fatima Prayer), angel (Pardon Prayer) */
+const DEC_SEQ=["of","hm","hm","hm","hm","hm","hm","hm","hm","hm","hm","gb","fp","pp"],DEC_N=DEC_SEQ.length;
+let hmState={day:"",c:{},rec:{}};try{hmState=JSON.parse(localStorage.getItem(LS_KEY+"-dec")||"null")||hmState}catch(e){}
+function hmCounts(){const d=new Date().toDateString();if(hmState.day!==d)hmState={day:d,c:{},rec:{}};if(!hmState.rec)hmState.rec={};return hmState.c}
+function hmSave(){try{localStorage.setItem(LS_KEY+"-dec",JSON.stringify(hmState))}catch(e){}}
+const DEC_ICON={
+  of:`<circle class="hp-i" r="24"/><g transform="scale(.7) translate(0,2)"><path class="hp-o" d="M1,-24 C5,-23 7,-18 8,-11 L10.5,3 C11.2,7 12.5,9.5 15,11.5 L9.5,18.5 L1,12 Z"/><path class="hp-o" d="M-1,-24 C-5,-23 -7,-18 -8,-11 L-10.5,3 C-11.2,7 -12.5,9.5 -15,11.5 L-9.5,18.5 L-1,12 Z"/><path class="hp-i" d="M9.5,18.5 L15,11.5 L21,16 L15.5,23 Z"/><path class="hp-i" d="M-9.5,18.5 L-15,11.5 L-21,16 L-15.5,23 Z"/></g>`,
+  gb:`<path class="hp-o" d="M-4,-23 h8 v10 h11 v8 h-11 v28 h-8 v-28 h-11 v-8 h11z"/>`,
+  fp:`<path class="hp-o" d="M0,20 C-21,5 -21,-12 -9,-12 C-4,-12 -1,-9 0,-6 C1,-9 4,-12 9,-12 C21,-12 21,5 0,20Z"/><path class="hp-i" d="M0,-9 C-5,-14 -3,-19 0,-25 C3,-19 5,-14 0,-9Z"/>`,
+  pp:`<circle class="hp-c" cx="0" cy="-17" r="5"/><path class="hp-o" d="M-2,14 C-6,0 -14,-8 -24,-12 C-22,0 -16,10 -2,14Z"/><path class="hp-o" d="M2,14 C6,0 14,-8 24,-12 C22,0 16,10 2,14Z"/><path class="hp-i" d="M0,-9 C3,-9 4,-6 4,-2 L3,12 L-3,12 L-4,-2 C-4,-6 -3,-9 0,-9Z"/>`
+};
+function decIcon(kind){return kind==="hm"?roseIcon():DEC_ICON[kind]}
+function decLabel(i){const k=DEC_SEQ[i];
+  return k==="of"?T("Our Father","Pater Noster"):k==="gb"?T("Glory Be","Gloria Patri"):k==="fp"?T("Fatima Prayer","Oratio Fatimae"):k==="pp"?T("Pardon Prayer","Oratio veniae"):`${T("Hail Mary","Ave Maria")} ${i}`}
+function hmRose(i,cls){
+  const gap=(i===1||i===11)?" gap":"";
+  return `<button type="button" class="hm-rose ${cls}${gap}" data-i="${i}" aria-label="${decLabel(i)}${cls?T(", prayed",", dicta"):""}"><svg viewBox="-26 -26 52 52" aria-hidden="true">${decIcon(DEC_SEQ[i])}</svg></button>`;
+}
+function hmRowInner(key){const c=hmCounts()[key]||0;let h="";for(let i=0;i<DEC_N;i++)h+=hmRose(i,i<c?(c===DEC_N?"on gold":"on"):"");return h}
+function hmRow(key){const c=hmCounts()[key]||0;
+  return `<div class="hm-row" data-key="${key}" role="group" aria-label="${T("Prayers said","Orationes dictae")}: ${c} / ${DEC_N}">${hmRowInner(key)}</div>`}
+// the five decade rows of one Rosary share a base key
+function rowBase(ms){return prayCtx.kind==="nov"?`n:${curNov()?curNov().id:"x"}:${prayCtx.day}:`:`d:${ms.set}:`}
+function isComplete(base){const c=hmCounts();for(let k=1;k<=5;k++)if((c[base+k]||0)!==DEC_N)return false;return true}
+function currentIntention(){return prayCtx.kind==="nov"?(curNov()&&curNov().intention||""):(state.intention||"")}
+function openingPrayers(P){
+  const it=currentIntention(),req=it?T(`(Here mention your request: “${esc(it)}”)`,`(Hic petitionem tuam commemora: “${esc(it)}”)`):T("(Here mention your request.)","(Hic petitionem tuam commemora.)");
+  return `<h4>${T("Prayer Before the Rosary","Oratio ante Rosarium")}</h4><p>${esc(P.prayerBeforeRosary[0])} <em style="color:var(--muted)">${req}</em> ${esc(P.prayerBeforeRosary[1])}</p><h4>${T("Apostles’ Creed","Symbolum Apostolorum")}</h4><p>${esc(P.apostlesCreed)}</p>
+    <h4>${T("Our Father","Pater Noster")}</h4><p>${esc(P.ourFather)}</p>
+    ${[["faith","fidei"],["hope","spei"],["charity (love)","caritatis (amoris)"]].map(([en,la])=>`<h4>${T("Hail Mary","Ave Maria")} <span style="text-transform:none;letter-spacing:0;font-weight:400;color:var(--muted)">${T(`for an increase in ${en}`,`pro augmento ${la}`)}</span></h4><p>${esc(P.hailMary)}</p>`).join("")}
+    <h4>${T("Glory Be","Gloria Patri")}</h4><p>${esc(P.gloryBe)}</p>`;
+}
+function doneBox(base){
+  if(!isComplete(base))return "";
+  if(prayCtx.kind==="nov")return `<div class="done-box" id="doneBox"><p>${T(`Day ${prayCtx.day} complete`,`Dies ${prayCtx.day} completus`)}</p><span class="meta">${T("Marked on your 54-Day Novena. Continue with the closing prayers below.","In novena notatus. Perge ad orationes conclusivas infra.")}</span></div>`;
+  const n=(byDay()[todayK()]||[]).length;
+  return `<div class="done-box" id="doneBox"><p>${T("Rosary complete","Rosarium completum")}</p><span class="meta">${T(`Counted in your history: ${n} today. Continue with the closing prayers below.`,`In historia numeratum: ${n} hodie. Perge ad orationes conclusivas infra.`)}</span><button class="btn" id="anotherBtn">${T("Pray another Rosary","Aliud Rosarium ora")}</button></div>`;
+}
+function decades(ms){
+  const set=ms.set,names=lang==="la"?MYSTERIES_LA[set]:MYSTERIES[set],base=rowBase(ms),P=lang==="la"?PRAYERS_LA:PRAYERS;
+  let h=`<p class="rub">${T(`The ${set} Mysteries (${ms.why}). For each decade: announce the mystery, pray one Our Father, ten Hail Marys, one Glory Be, the Fatima Prayer, and the Pardon Prayer. Tap + beside a mystery for a Scriptural Rosary verse to read before each Hail Mary, and tap each icon as you pray: the praying hands for the Our Father, a rose for each Hail Mary, then the Glory Be, Fatima Prayer and Pardon Prayer.`,
+    `Mysteria ${SET_LA[set]} (${ms.whyLa}). In singulis decadibus: enuntia mysterium, ora semel Pater Noster, decies Ave Maria, semel Gloria Patri, Orationem Fatimae et Orationem veniae. Tange + iuxta mysterium ut versum Scripturae ante singulas Ave Maria legas, et singula signa tange dum oras: manus orantes pro Pater Noster, rosam pro singulis Ave Maria, deinde Gloria Patri, Orationem Fatimae et Orationem veniae.`)}</p><ol>`;
+  for(let k=1;k<=5;k++){
+    const vs=MYSTERY_VERSES[set][k-1].map(([r,t],i)=>lang==="la"?[refLa(r),MYSTERY_VERSES_LA[set][k-1][i]]:[r,t]);
+    h+=`<li style="margin-bottom:6px"><details class="myst"><summary aria-label="${esc(names[k-1][0])}: ${T("show Scripture verses","versus Scripturae")}"><span><strong style="font-weight:600">${esc(names[k-1][0])}</strong><br><em style="color:var(--muted)">(${esc(names[k-1][1])})</em></span></summary><ol class="verses">${vs.map(([r,t])=>`<li>${esc(t)} <span class="ref">${esc(r)}</span></li>`).join("")}</ol></details>${hmRow(base+k)}</li>`;}
+  h+=`</ol><div id="doneSlot">${doneBox(base)}</div><details style="border:none"><summary style="font-size:15px;min-height:44px;font-family:var(--f-ui);font-weight:500;color:var(--marian)">${T("Show the decade prayers","Orationes decadis")}</summary>
+    <h4>${T("Our Father","Pater Noster")}</h4><p>${esc(P.ourFather)}</p><h4>${T("Hail Mary ×10","Ave Maria ×10")}</h4><p>${esc(P.hailMary)}</p><h4>${T("Glory Be","Gloria Patri")}</h4><p>${esc(P.gloryBe)}</p><h4>${T("Fatima Prayer","Oratio Fatimae")}</h4><p>${esc(P.fatima)}</p><h4>${T("Pardon Prayer","Oratio veniae")}</h4><p>${esc(P.pardonPrayer)}</p></details>`;
+  return h;
+}
+function novOfferings(d){
+  const N=NOVENA[lang],ph=novPhase(d),set=novSet(d),it=currentIntention();
+  const ins=it?`<em class="intent-insert">${esc(it)}</em>`:`<em style="color:var(--muted)">${esc(N.noRequest)}</em>`;
+  return {
+    crown:`<p>${esc(N.crownOpen[ph])} ${esc(N.roses[set])} ${esc(N.bound[ph])}</p><p>${esc(N.crownClose[ph])}</p>`,
+    close:`<h4>${T("Spiritual Communion","Communio spiritualis")}</h4><p>${esc(N.spiritualCommunion)}</p><h4>${T(ph==="petition"?"Offering in petition":"Offering in thanksgiving",ph==="petition"?"Oblatio in petitione":"Oblatio in gratiarum actione")}</h4><p>${esc(N.sweetMother[ph][0])} ${ins}${esc(N.sweetMother[ph][1])}</p>`
+  };
+}
+let mysteryChoice=null;
+function prayMs(){
+  if(prayCtx.kind==="nov"){const d=prayCtx.day,s=novSet(d);
+    return{set:s,why:`Day ${d} of the 54-Day Novena, in ${novPhase(d)}`,whyLa:`dies ${d} novenae, in ${novPhase(d)==="petition"?"petitione":"gratiarum actione"}`}}
+  const sug=mysteriesFor(new Date()),today=new Date().toDateString();
+  const chosen=mysteryChoice&&mysteryChoice.day===today?mysteryChoice.set:null;
+  return chosen&&chosen!==sug.set?{set:chosen,why:`your choice; today’s suggestion is the ${sug.set} Mysteries`,whyLa:`electio tua; hodie suadentur Mysteria ${SET_LA[sug.set]}`,sug:sug.set}:Object.assign({sug:sug.set},sug);
+}
+function drawPrayers(){
+  const P=lang==="la"?PRAYERS_LA:PRAYERS,ms=prayMs(),nov=prayCtx.kind==="nov",n=curNov();
+  $("prayTitle").textContent=nov?T(`Day ${prayCtx.day} of 54`,`Dies ${prayCtx.day} ex 54`):T("The Holy Rosary","Sanctissimum Rosarium");
+  const lb=$("langBtn");lb.dataset.lang=lang;lb.setAttribute("aria-label",T("Show prayers in Latin","Show prayers in English"));
+  $("prayBody").lang=lang==="la"?"la":"en";
+  const dc=$("dayChips");dc.hidden=!nov;
+  if(nov){dc.innerHTML=Array.from({length:NOV_DAYS},(_,i)=>`<button role="tab" aria-selected="${i+1===prayCtx.day}" class="${i+1===prayCtx.day?"sel":""} ${n&&n.days[i]?"dn":""}" data-d="${i+1}" aria-label="Day ${i+1}${n&&n.days[i]?", prayed":""}">${i+1}</button>`).join("");
+    const sel=dc.querySelector(".sel");if(sel)requestAnimationFrame(()=>{dc.scrollLeft=sel.offsetLeft-dc.clientWidth/2+22})}
+  const it=currentIntention();
+  const intent=it?`<div class="pray-intent"><span class="label">${T("Praying for","Pro intentione")}</span><p>${esc(it)}</p></div>`:"";
+  let top="";
+  if(nov){const d=prayCtx.day;top=`<div class="nov-info"><b>${T(`${novSet(d)} Mysteries`,`Mysteria ${SET_LA[novSet(d)]}`)} · ${phaseName(d,lang==="la")}</b>${T(d<=NOV_HALF?`Day ${d} of 27 in petition.`:`Day ${d-NOV_HALF} of 27 in thanksgiving.`,d<=NOV_HALF?`Dies ${d} ex 27 in petitione.`:`Dies ${d-NOV_HALF} ex 27 in gratiarum actione.`)}</div>`}
+  else{const setLabel=k=>T(`${k} Mysteries`,`Mysteria ${SET_LA[k]}`)+(k===ms.sug?T(" (today)"," (hodie)"):"");
+    top=`<div class="myst-pick"><label class="label" for="mysterySelect">${T("Mysteries to pray","Mysteria oranda")}</label>
+    <select id="mysterySelect">${SETS.map(k=>`<option value="${k}"${k===ms.set?" selected":""}>${setLabel(k)}</option>`).join("")}</select></div>`}
+  const sec=(num,title,body,open)=>`<details${open?" open":""}><summary><span class="n">${num}</span>${title}</summary><div class="prayer">${body}</div></details>`;
+  let i=1,h=intent+top+sec(i++,T("Sign of the Cross","Signum Crucis"),para(P.signOfCross),true);
+  const off=nov?novOfferings(prayCtx.day):null;
+  if(nov)h+=sec(i++,T("Offering of the Crown of Roses","Oblatio coronae rosarum"),off.crown);
+  h+=sec(i++,T("Opening prayers","Orationes initiales"),openingPrayers(P));
+  h+=sec(i++,T(`The ${ms.set} Mysteries`,`Mysteria ${SET_LA[ms.set]}`),decades(ms),true);
+  h+=sec(i++,T("Closing prayers","Orationes conclusivae"),`<h4>${T("Hail, Holy Queen","Salve Regina")}</h4>${para(P.hailHolyQueen)}<h4>${T("Prayer after the Rosary","Oratio post Rosarium")}</h4>${para(P.prayerAfterRosary)}`);
+  if(nov)h+=sec(i++,T("Closing offering","Oblatio conclusiva"),off.close);
+  h+=sec(i++,T("Prayer to Saint Joseph","Oratio ad Sanctum Ioseph"),P.stJoseph.map(t=>`<p class="lines">${esc(t).split("\n").map(l=>`<span>${l}</span>`).join("")}</p>`).join(""));
+  $("prayBody").innerHTML=h;
+  bindAnother();
+}
+function bindAnother(){const b=$("anotherBtn");if(b)b.onclick=()=>{
+  const base=rowBase(prayMs()),c=hmCounts();for(let k=1;k<=5;k++)delete c[base+k];delete hmState.rec[base];hmSave();redrawKeepingPlace();
+  const first=$("prayBody").querySelector(".hm-row");if(first)first.scrollIntoView({behavior:"smooth",block:"center"});toast(T("A fresh Rosary is ready","Novum Rosarium paratum est"))}}
+function redrawKeepingPlace(){
+  const sh=$("prayOverlay").querySelector(".sheet"),y=sh.scrollTop,open=[...$("prayBody").querySelectorAll("details")].map(d=>d.open);
+  drawPrayers();[...$("prayBody").querySelectorAll("details")].forEach((d,i)=>{if(i<open.length)d.open=open[i]});sh.scrollTop=y;
+}
+function openPrayers(ctx){prayCtx=ctx;drawPrayers();show("prayOverlay");$("prayOverlay").querySelector(".sheet").scrollTop=0}
+$("prayClose").onclick=()=>hide("prayOverlay");
+// when all five decade rows turn gold, the Rosary is counted (taking an icon back un-counts it)
+function checkRosary(){
+  const ms=prayMs(),base=rowBase(ms),full=isComplete(base),rec=hmState.rec[base];
+  if(full&&!rec){
+    if(prayCtx.kind==="nov"){const n=curNov(),d=prayCtx.day;
+      if(n&&!n.days[d-1]){const nd=novNext(n);if(nd===d){markNovDay(n,d,true);hmState.rec[base]=n.days[d-1];toast(T(`Day ${d} complete. God bless you.`,`Dies ${d} completus. Deus te benedicat.`))}
+        else{hmState.rec[base]="x";toast(T(`Decades complete. Day ${nd} comes next on the tracker.`,`Decades completae.`))}}
+      else hmState.rec[base]="x";
+    }else{const r=addRosary({set:ms.set,lang,src:"app"});hmState.rec[base]=r.id;toast(T("Rosary complete. Thanks be to God.","Rosarium completum. Deo gratias."))}
+    hmSave();
+  }else if(!full&&rec){
+    if(prayCtx.kind==="nov"){const n=curNov(),d=prayCtx.day;if(n&&n.days[d-1]&&n.days[d-1]===rec){n.days[d-1]=null;n.completedAt=null;save();render();evalBadges(false);toast(T(`Day ${d} taken back`,`Dies ${d} revocatus`))}}
+    else if(state.rosaries.some(r=>r.id===rec)){removeRosary(rec);toast(T("Rosary taken back","Rosarium revocatum"))}
+    delete hmState.rec[base];hmSave();
+  }
+  $("doneSlot").innerHTML=doneBox(base);bindAnother();
+  if(prayCtx.kind==="nov"){const n=curNov();[...$("dayChips").children].forEach((b,i)=>b.classList.toggle("dn",!!(n&&n.days[i])))}
+}
+$("prayBody").addEventListener("click",e=>{
+  const b=e.target.closest(".hm-rose");if(!b)return;e.preventDefault();
+  const row=b.closest(".hm-row"),key=row.dataset.key,counts=hmCounts(),c=counts[key]||0,i=+b.dataset.i;
+  const nc=(i===c-1)?c-1:Math.min(DEC_N,c+1);   // tap the newest icon to take it back; any other icon adds the next one
+  counts[key]=nc;hmSave();row.innerHTML=hmRowInner(key);row.setAttribute("aria-label",`${T("Prayers said","Orationes dictae")}: ${nc} / ${DEC_N}`);
+  if(nc===DEC_N){[...row.children].forEach((r,j)=>{r.classList.add("pop");r.querySelector("svg").style.animationDelay=(j*40)+"ms"});if(!isComplete(key.slice(0,-1)))toast(T("Decade complete","Decas completa"))}
+  else if(nc>c){row.children[nc-1].classList.add("pop")}
+  checkRosary();
+});
+$("prayBody").addEventListener("change",e=>{if(e.target.id!=="mysterySelect")return;
+  mysteryChoice={day:new Date().toDateString(),set:e.target.value};redrawKeepingPlace()});
+const FS_STEPS=[0.85,1,1.15,1.3,1.5,1.75];
+let fsIdx=1;try{const v=parseInt(localStorage.getItem(LS_KEY+"-fs"),10);if(v>=0&&v<FS_STEPS.length)fsIdx=v}catch(e){}
+function applyFs(){$("prayBody").style.setProperty("--ps",FS_STEPS[fsIdx]);$("fsDown").disabled=fsIdx===0;$("fsUp").disabled=fsIdx===FS_STEPS.length-1}
+function stepFs(d){fsIdx=Math.max(0,Math.min(FS_STEPS.length-1,fsIdx+d));try{localStorage.setItem(LS_KEY+"-fs",fsIdx)}catch(e){}applyFs()}
+$("fsDown").onclick=()=>stepFs(-1);$("fsUp").onclick=()=>stepFs(1);applyFs();
+$("langBtn").onclick=()=>{lang=lang==="la"?"en":"la";try{localStorage.setItem(LS_KEY+"-lang",lang)}catch(e){}redrawKeepingPlace()};
+$("dayChips").addEventListener("click",e=>{const b=e.target.closest("[data-d]");if(b){prayCtx={kind:"nov",day:+b.dataset.d};drawPrayers()}});
+
+/* ---------- overlays, toast, petals ---------- */
+function show(id){$(id).hidden=false}
+function hide(id){$(id).hidden=true}
+document.querySelectorAll(".overlay").forEach(o=>o.addEventListener("click",e=>{if(e.target===o){if(o.id==="badgeOverlay"){badgeQueue=[];}o.hidden=true}}));
+document.addEventListener("keydown",e=>{if(e.key==="Escape"){badgeQueue=[];document.querySelectorAll(".overlay").forEach(o=>o.hidden=true)}});
+let toastT;
+function toast(msg){let t=document.querySelector(".toast");if(!t){t=document.createElement("div");t.className="toast";t.setAttribute("role","status");document.body.appendChild(t)}t.textContent=msg;t.hidden=false;clearTimeout(toastT);toastT=setTimeout(()=>t.hidden=true,3200)}
+function celebrate(){
+  if(matchMedia("(prefers-reduced-motion: reduce)").matches)return;
+  for(let i=0;i<40;i++){const p=document.createElement("div");p.className="petal-fall";
+    p.style.left=Math.random()*100+"vw";p.style.setProperty("--dx",(Math.random()*120-60)+"px");p.style.setProperty("--rot",(Math.random()*720-360)+"deg");
+    p.style.animationDuration=(3+Math.random()*3)+"s";p.style.animationDelay=(Math.random()*1.5)+"s";
+    if(i%3===0)p.style.background="var(--rose-light)";document.body.appendChild(p);setTimeout(()=>p.remove(),8000)}
+}
+
+/* ---------- theme ---------- */
+const THEMES=["auto","light","dark"];let theme="auto";
+try{theme=localStorage.getItem(THEME_KEY)||"auto"}catch(e){}
+function applyTheme(){if(theme==="auto")document.documentElement.removeAttribute("data-theme");else document.documentElement.setAttribute("data-theme",theme);
+  $("themeBtn").textContent=theme==="auto"?"Auto":theme==="light"?"Light":"Dark"}
+$("themeBtn").onclick=()=>{theme=THEMES[(THEMES.indexOf(theme)+1)%3];try{localStorage.setItem(THEME_KEY,theme)}catch(e){}applyTheme()};
+applyTheme();
+
+/* ---------- backup / restore ---------- */
+$("exportBtn").onclick=()=>{
+  const blob=new Blob([JSON.stringify(state,null,2)],{type:"application/json"});
+  const a=document.createElement("a");a.href=URL.createObjectURL(blob);
+  a.download="rose-garden-backup-"+todayK()+".json";
+  document.body.appendChild(a);a.click();setTimeout(()=>{URL.revokeObjectURL(a.href);a.remove()},500);
+  toast("Backup saved to your downloads");
+};
+$("importBtn").onclick=()=>$("importFile").click();
+$("importFile").onchange=e=>{
+  const f=e.target.files[0];if(!f)return;const r=new FileReader();
+  r.onload=()=>{try{const d=JSON.parse(r.result);if(!d||!Array.isArray(d.rosaries))throw 0;
+      state=Object.assign(blankState(),d);save();evalBadges(false);render();toast("Backup restored");}catch(err){toast("That file isn’t a Rose Garden backup")}
+    e.target.value="";};
+  r.readAsText(f);
+};
+/* ---------- intentions journal ---------- */
+function journal(){if(!Array.isArray(state.journal))state.journal=[];return state.journal}
+let jEdit=null,jDel=null;
+function drawJournal(){
+  const all=[...journal()].sort((a,b)=>b.createdAt-a.createdAt),open=all.filter(j=>!j.usedIn),done=all.filter(j=>j.usedIn);
+  const item=j=>{
+    const nov=j.usedIn&&state.novenas.find(n=>n.id===j.usedIn);
+    const meta=`Added ${fmtShort(new Date(j.createdAt))}`+(j.usedIn?` · 54-Day Novena begun ${fmtShort(j.usedAt)}`+(nov&&novCount(nov)===NOV_DAYS?" · Completed":""):"")+(j.text===state.intention?" · Today’s intention":"");
+    if(jEdit===j.id)return `<li class="j-item" data-id="${j.id}"><label class="label" for="jEditBox">Edit intention</label><textarea id="jEditBox">${esc(j.text)}</textarea>
+      <div class="j-actions"><button class="link-btn" data-act="save">Save</button><button class="link-btn" data-act="cancel">Cancel</button></div></li>`;
+    const acts=jDel===j.id?`<span class="meta" style="align-self:center">Delete this entry?</span><button class="link-btn" data-act="cancel">Keep it</button><button class="link-btn" data-act="confirm" style="color:var(--rose)">Delete</button>`
+      :`${j.usedIn?"":`<button class="link-btn" data-act="today">Pray for this today</button><button class="link-btn" data-act="use">Start a 54-Day Novena</button>`}<button class="link-btn" data-act="edit">Edit</button><button class="link-btn" data-act="del" style="color:var(--rose)">Delete</button>`;
+    return `<li class="j-item${j.usedIn?" done":""}" data-id="${j.id}"><p class="j-text">${esc(j.text)}</p><div class="meta">${meta}</div><div class="j-actions">${acts}</div></li>`;
+  };
+  $("journalList").innerHTML=`<div class="j-head">Waiting to be prayed (${open.length})</div>`+
+    (open.length?`<ul class="j-list">${open.map(item).join("")}</ul>`:`<p class="j-empty">Nothing saved yet. Intentions you add will wait here until you pray them.</p>`)+
+    (done.length?`<div class="j-head" style="margin-top:20px">Given to a 54-Day Novena (${done.length})</div><ul class="j-list">${done.map(item).join("")}</ul>`:"");
+}
+$("journalBtn").onclick=()=>{jEdit=null;jDel=null;drawJournal();show("journalOverlay")};
+$("journalClose").onclick=()=>hide("journalOverlay");
+$("journalAdd").onclick=()=>{const t=$("journalInput").value.trim();if(!t){$("journalInput").focus();return}
+  journal().push({id:uidGen(),text:t,createdAt:Date.now()});$("journalInput").value="";save();drawJournal();toast("Added to your journal")};
+$("journalList").addEventListener("click",e=>{
+  const b=e.target.closest("[data-act]");if(!b)return;const id=b.closest(".j-item").dataset.id,j=journal().find(x=>x.id===id);if(!j)return;
+  const a=b.dataset.act;
+  if(a==="today"){state.intention=j.text;save();hide("journalOverlay");if(mode!=="daily")setMode("daily");else render();toast("Today’s intention set");return}
+  if(a==="use"){hide("journalOverlay");openNew(j.text,j.id);return}
+  if(a==="edit"){jEdit=id;jDel=null;drawJournal();$("jEditBox").focus();return}
+  if(a==="save"){const t=$("jEditBox").value.trim();if(t){j.text=t;save()}jEdit=null;drawJournal();return}
+  if(a==="del"){jDel=id;jEdit=null;drawJournal();return}
+  if(a==="confirm"){state.journal=journal().filter(x=>x.id!==id);jDel=null;save();drawJournal();toast("Entry deleted");return}
+  if(a==="cancel"){jEdit=null;jDel=null;drawJournal()}
+});
+
+/* ---------- install to home screen ---------- */
+(function(){
+  const btn=$("installBtn");
+  const standalone=()=>matchMedia("(display-mode: standalone)").matches||navigator.standalone===true;
+  const onWeb=location.protocol==="https:"||location.hostname==="localhost";
+  const ua=navigator.userAgent;
+  const isIOS=/iphone|ipad|ipod/i.test(ua)||(navigator.platform==="MacIntel"&&navigator.maxTouchPoints>1);
+  const shareIcon='<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-label="Share"><path d="M12 3v12"/><path d="M8 7l4-4 4 4"/><path d="M6 11H5a1 1 0 0 0-1 1v8a1 1 0 0 0 1 1h14a1 1 0 0 0 1-1v-8a1 1 0 0 0-1-1h-1"/></svg>';
+  const plusIcon='<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="4"/><path d="M12 8v8M8 12h8"/></svg>';
+  let deferred=null;
+  if(standalone()||!onWeb)return;              // already installed, or opened as a plain file
+  window.addEventListener("beforeinstallprompt",e=>{e.preventDefault();deferred=e;btn.hidden=false});
+  window.addEventListener("appinstalled",()=>{btn.hidden=true;deferred=null;toast("Installed. Look for the crowned M on your home screen.")});
+  if(isIOS)btn.hidden=false;
+  else setTimeout(()=>{btn.hidden=false},2500); // other browsers: offer the guide
+  function guide(){
+    const steps=isIOS?[
+      `Tap the <strong>Share</strong> button ${shareIcon} in Safari’s toolbar (at the bottom of the screen, or at the top on iPad).`,
+      `Scroll down and tap <strong>Add to Home Screen</strong> ${plusIcon}.`,
+      `Tap <strong>Add</strong>. The crowned M will appear on your home screen.`
+    ]:[
+      `Open your browser’s menu (usually <strong>⋮</strong> or <strong>☰</strong>).`,
+      `Tap <strong>Install app</strong> or <strong>Add to Home screen</strong>.`,
+      `Confirm, and the crowned M will appear on your home screen.`
+    ];
+    $("installSteps").innerHTML=steps.map(t=>`<li><span>${t}</span></li>`).join("");
+    show("installOverlay");
+  }
+  btn.onclick=async()=>{
+    if(deferred){deferred.prompt();const r=await deferred.userChoice.catch(()=>null);deferred=null;if(r&&r.outcome==="accepted")btn.hidden=true;return}
+    guide();
+  };
+  $("installDone").onclick=()=>hide("installOverlay");
+})();
+
+/* ---------- PIN lock ---------- */
+let pinRec=null;try{pinRec=JSON.parse(localStorage.getItem(PIN_KEY)||"null")}catch(e){}
+function h53(str){let h1=0xdeadbeef,h2=0x41c6ce57;for(let i=0;i<str.length;i++){const c=str.charCodeAt(i);h1=Math.imul(h1^c,2654435761);h2=Math.imul(h2^c,1597334677)}
+  h1=Math.imul(h1^(h1>>>16),2246822507)^Math.imul(h2^(h2>>>13),3266489909);h2=Math.imul(h2^(h2>>>16),2246822507)^Math.imul(h1^(h1>>>13),3266489909);
+  return (4294967296*(2097151&h2)+(h1>>>0)).toString(36)}
+const hashPin=(pin,salt)=>h53(salt+":"+pin+":roses");
+let lockMode="enter",entry="",firstPin="",fails=0;
+const wrapEl=document.querySelector(".wrap");
+function setLockText(title,msg,err){$("lockTitle").textContent=title;$("lockMsg").textContent=msg||"";$("lockMsg").classList.toggle("err",!!err)}
+function drawDots(){[...$("pinDots").children].forEach((d,i)=>d.classList.toggle("on",i<entry.length))}
+function lock(mode){
+  lockMode=mode||(pinRec?"enter":"create");entry="";drawDots();
+  document.querySelectorAll(".overlay").forEach(o=>o.hidden=true);
+  document.body.classList.add("locked");wrapEl.inert=true;$("lockScreen").hidden=false;
+  $("lockCancel").style.visibility=(lockMode==="change"||lockMode==="clear"||(!REQUIRE_PIN&&lockMode==="create"))?"visible":"hidden";$("forgotBtn").hidden=lockMode!=="enter";
+  if(lockMode==="enter")setLockText("Enter your PIN","");
+  else if(lockMode==="change")setLockText("Enter your current PIN","");
+  else if(lockMode==="clear")setLockText("Clear all history?","Enter your PIN to permanently delete every Rosary, novena, reflection, intention and achievement.",true);
+  else setLockText("Create a 4-digit PIN","You’ll enter it each time you open this page.");
+}
+function unlock(){document.body.classList.remove("locked");wrapEl.inert=false;$("lockScreen").hidden=true;entry="";fails=0;$("changePinBtn").textContent=pinRec?"Change PIN":"Set a PIN"}
+function bad(msg){const d=$("pinDots");d.classList.remove("shake");void d.offsetWidth;d.classList.add("shake");entry="";drawDots();$("lockMsg").textContent=msg;$("lockMsg").classList.add("err")}
+function clearAll(){state=blankState();state.updatedAt=Date.now();editing=false;calMonth=null;save();render();}
+function submitPin(){
+  if(lockMode==="clear"){
+    if(pinRec&&hashPin(entry,pinRec.salt)===pinRec.hash){clearAll();unlock();toast("History cleared")}
+    else bad("Incorrect PIN. Nothing was deleted.");
+    return;
+  }
+  if(lockMode==="enter"||lockMode==="change"){
+    if(pinRec&&hashPin(entry,pinRec.salt)===pinRec.hash){
+      if(lockMode==="change"){lockMode="create";entry="";drawDots();$("lockCancel").style.visibility="visible";setLockText("Choose a new PIN","")}
+      else unlock();
+    }else{fails++;bad(fails>=3?"Incorrect PIN. Take your time.":"Incorrect PIN")}
+  }else if(lockMode==="create"){firstPin=entry;lockMode="confirm";entry="";drawDots();setLockText("Confirm your PIN","Enter the same 4 digits again.")}
+  else if(lockMode==="confirm"){
+    if(entry===firstPin){const salt=Math.random().toString(36).slice(2,10);pinRec={salt,hash:hashPin(entry,salt)};
+      try{localStorage.setItem(PIN_KEY,JSON.stringify(pinRec))}catch(e){}
+      unlock();toast("PIN saved");}
+    else{lockMode="create";bad("Those didn’t match. Choose a PIN again.");$("lockTitle").textContent="Create a 4-digit PIN"}
+  }
+}
+function press(k){
+  if(k==="del"){entry=entry.slice(0,-1);drawDots();return}
+  if(entry.length>=4)return;entry+=k;drawDots();
+  if(entry.length===4)setTimeout(submitPin,140);
+}
+$("keypad").addEventListener("click",e=>{const b=e.target.closest("[data-k]");if(b)press(b.dataset.k)});
+document.addEventListener("keydown",e=>{if($("lockScreen").hidden)return;
+  if(/^[0-9]$/.test(e.key)){e.preventDefault();press(e.key)}else if(e.key==="Backspace"){e.preventDefault();press("del")}},true);
+$("lockCancel").onclick=()=>unlock();
+$("lockNowBtn").onclick=()=>{if(!pinRec&&!REQUIRE_PIN){toast("Set a PIN first to lock the page");lock("create");return}lock()};
+$("clearHistBtn").onclick=()=>{const empty=!state.rosaries.length&&!state.novenas.length&&!journal().length&&!Object.keys(state.reflections).length;
+  if(empty){toast("There’s no history to clear");return}
+  if(pinRec){lock("clear");return}
+  if(REQUIRE_PIN){lock("create");return}
+  confirmBox("Clear all history?","This permanently deletes every Rosary, novena, reflection, intention and achievement on this phone.","Clear history",()=>{clearAll();toast("History cleared")})};
+$("changePinBtn").onclick=()=>lock(pinRec?"change":"create");
+$("forgotBtn").onclick=()=>{
+  const f=$("lockFoot");
+  f.innerHTML=`<span class="meta" style="flex-basis:100%">A forgotten PIN can’t be recovered. You can erase everything on this page and start fresh, then restore a backup if you have one.</span>
+    <button class="link-btn" id="eraseNo">Keep trying</button><button class="link-btn" id="eraseYes" style="color:var(--rose)">Erase and start over</button>`;
+  f.style.flexWrap="wrap";
+  $("eraseNo").onclick=resetFoot;
+  $("eraseYes").onclick=()=>{try{localStorage.removeItem(PIN_KEY);localStorage.removeItem(LS_KEY);localStorage.removeItem(LS_KEY+"-dec")}catch(e){}
+    pinRec=null;hmState={day:"",c:{},rec:{}};clearAll();resetFoot();lock("create");};
+};
+function resetFoot(){const f=$("lockFoot");f.innerHTML=`<button class="link-btn" id="forgotBtn">Forgot PIN?</button>`;f.style.flexWrap="";bindForgot()}
+const forgotHandler=$("forgotBtn").onclick;
+function bindForgot(){$("forgotBtn").onclick=forgotHandler;$("forgotBtn").hidden=lockMode!=="enter"}
+// lock again after the page has been in the background for 2 minutes; redraw when a new day has begun
+let hiddenAt=0,shownDay=todayK();
+document.addEventListener("visibilitychange",()=>{if(document.hidden){hiddenAt=Date.now();return}
+  if(shownDay!==todayK()){shownDay=todayK();calMonth=null;render()}
+  if(hiddenAt&&Date.now()-hiddenAt>120000&&$("lockScreen").hidden&&pinRec)lock();});
+setInterval(()=>{if(shownDay!==todayK()){shownDay=todayK();calMonth=null;render()}},60000);
+evalBadges(false);
+render();
+if(pinRec||REQUIRE_PIN)lock();else unlock();
+$("noJsNote").hidden=true;
+/* ---------- installable app support ---------- */
+if("serviceWorker" in navigator&&(location.protocol==="https:"||location.hostname==="localhost")){
+  window.addEventListener("load",()=>{navigator.serviceWorker.register("sw.js").catch(()=>{})});
+}
+// ask the browser to keep this app's saved data even when storage runs low
+try{navigator.storage&&navigator.storage.persist&&navigator.storage.persist()}catch(e){}
+</script>
+
+</body>
+</html>

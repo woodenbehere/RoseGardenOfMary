@@ -1,0 +1,16 @@
+{
+  "name": "Rose Garden of Mary",
+  "short_name": "Rose Garden",
+  "description": "Pray and track your daily Rosary and the 54-Day Rosary Novena, with streaks, a calendar and achievements.",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "any",
+  "background_color": "#f5f1ea",
+  "theme_color": "#23457d",
+  "icons": [
+    { "src": "icons/icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
+    { "src": "icons/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" },
+    { "src": "icons/icon-maskable-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+  ]
+}
