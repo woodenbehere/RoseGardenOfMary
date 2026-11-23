@@ -36,7 +36,7 @@
   --bud:#ece6da;
   --bud-edge:#b3aa9a;
   --sepal:#7d9a7c;
-  --gold:#c9a24a;
+  --gold:#c9a24a; --gold-text:#94701c;   /* deeper gold so text stays readable in light mode */
   --gold-ink:#6f5418;
   --gold-soft:#f4e9cb;
   --shadow:0 1px 2px rgba(31,36,51,.06),0 8px 24px rgba(31,36,51,.07);
@@ -49,13 +49,13 @@
   --bg:#0e1424; --paper:#161f33; --ink:#ece9e2; --muted:#a1a7b6; --line:#2a344c;
   --marian:#93b2e8; --marian-soft:#1f2b45; --rose:#e05a74; --rose-deep:#a8304c; --rose-light:#f29cad; --rose-soft:#4a2433;
   --glow:rgba(240,95,125,.55); --bud:#232c42; --bud-edge:#58637d; --sepal:#6f8f74;
-  --gold:#d7b462; --gold-ink:#2b2008; --gold-soft:#3a3018; --shadow:0 1px 2px rgba(0,0,0,.3),0 8px 24px rgba(0,0,0,.3);
+  --gold:#d7b462; --gold-text:#d7b462; --gold-ink:#2b2008; --gold-soft:#3a3018; --shadow:0 1px 2px rgba(0,0,0,.3),0 8px 24px rgba(0,0,0,.3);
   --note:#2c2614; --note-ink:#e6d39c; color-scheme:dark}}
 :root[data-theme="dark"]{
   --bg:#0e1424; --paper:#161f33; --ink:#ece9e2; --muted:#a1a7b6; --line:#2a344c;
   --marian:#93b2e8; --marian-soft:#1f2b45; --rose:#e05a74; --rose-deep:#a8304c; --rose-light:#f29cad; --rose-soft:#4a2433;
   --glow:rgba(240,95,125,.55); --bud:#232c42; --bud-edge:#58637d; --sepal:#6f8f74;
-  --gold:#d7b462; --gold-ink:#2b2008; --gold-soft:#3a3018; --shadow:0 1px 2px rgba(0,0,0,.3),0 8px 24px rgba(0,0,0,.3);
+  --gold:#d7b462; --gold-text:#d7b462; --gold-ink:#2b2008; --gold-soft:#3a3018; --shadow:0 1px 2px rgba(0,0,0,.3),0 8px 24px rgba(0,0,0,.3);
   --note:#2c2614; --note-ink:#e6d39c; color-scheme:dark}
 
 body{background:var(--bg);color:var(--ink);font-family:var(--f-body);font-size:17px;line-height:1.55}
@@ -342,6 +342,12 @@ textarea.notepad{min-height:224px;line-height:32px;padding:4px 12px;margin-top:6
 .site-foot a{color:var(--marian);text-decoration:none;font-weight:500}
 .site-foot a:hover{text-decoration:underline}
 .site-foot .mail-link{display:inline-grid;place-items:center;min-width:24px;min-height:32px}
+/* gold for finished parts of the prayers */
+#prayBody > details.sec-done > summary{color:var(--gold-text)}
+#prayBody > details.sec-done > summary .n{background:var(--gold);box-shadow:0 0 0 2px var(--paper),0 0 0 3.5px var(--gold)}
+#prayBody > details.sec-done > .prayer,#prayBody > details.sec-done > .prayer :is(p,li,h4,strong,em,span,summary,ol){color:var(--gold-text)!important;transition:color .4s}
+li.dec-done details.myst > summary strong,li.dec-done details.myst > summary em{color:var(--gold-text)!important;transition:color .4s}
+li.dec-done::marker{color:var(--gold-text);font-weight:600}
 @media (prefers-reduced-motion: reduce){*{animation:none!important;transition:none!important}}
 </style>
 
@@ -420,7 +426,7 @@ textarea.notepad{min-height:224px;line-height:32px;padding:4px 12px;margin-top:6
     </div></div>
 
   <footer class="site-foot">
-    <span>Jacoby / Parden Web Apps 2026</span><span class="sep">-</span><span id="appVersion">v3</span><span class="sep">-</span><a href="https://venmo.com/James-Parden" target="_blank" rel="noopener">Donate</a><span class="sep">-</span><a href="mailto:jdparden@gmail.com?subject=Rose%20Garden%20of%20Mary" class="mail-link" aria-label="Email jdparden@gmail.com" title="Email jdparden@gmail.com"><svg width="18" height="14" viewBox="0 0 24 18" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round" stroke-linecap="round" aria-hidden="true"><rect x="1.5" y="1.5" width="21" height="15" rx="2.5"/><path d="M2.5 3l9.5 7 9.5-7"/></svg></a>
+    <span>Jacoby / Parden Web Apps 2026</span><span class="sep">-</span><span id="appVersion">v4</span><span class="sep">-</span><a href="https://venmo.com/James-Parden" target="_blank" rel="noopener">Donate</a><span class="sep">-</span><a href="mailto:jdparden@gmail.com?subject=Rose%20Garden%20of%20Mary" class="mail-link" aria-label="Email jdparden@gmail.com" title="Email jdparden@gmail.com"><svg width="18" height="14" viewBox="0 0 24 18" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round" stroke-linecap="round" aria-hidden="true"><rect x="1.5" y="1.5" width="21" height="15" rx="2.5"/><path d="M2.5 3l9.5 7 9.5-7"/></svg></a>
   </footer>
 </div>
 
@@ -708,7 +714,7 @@ const NOVENA = {
 };
 /* ===================== end of editable section ===================== */
 
-const APP_VERSION="3";
+const APP_VERSION="4";
 const REQUIRE_PIN=true; // the blank copy sets this to false: no PIN until you choose one
 const LS_KEY="rosegarden-data", THEME_KEY="rosegarden-theme", PIN_KEY="rosegarden-pin";
 const $=id=>document.getElementById(id);
@@ -1235,12 +1241,16 @@ function hmRow(key){const c=hmCounts()[key]||0;
 function rowBase(ms){return prayCtx.kind==="nov"?`n:${curNov()?curNov().id:"x"}:${prayCtx.day}:`:`d:${ms.set}:`}
 function isComplete(base){const c=hmCounts();for(let k=1;k<=5;k++)if((c[base+k]||0)!==DEC_N)return false;return true}
 function currentIntention(){return prayCtx.kind==="nov"?(curNov()&&curNov().intention||""):(state.intention||"")}
-function openingPrayers(P){
+function beforeRosaryHtml(P){
   const it=currentIntention(),req=it?T(`(Here mention your request: “${esc(it)}”)`,`(Hic petitionem tuam commemora: “${esc(it)}”)`):T("(Here mention your request.)","(Hic petitionem tuam commemora.)");
-  return `<h4>${T("Prayer Before the Rosary","Oratio ante Rosarium")}</h4><p>${esc(P.prayerBeforeRosary[0])} <em style="color:var(--muted)">${req}</em> ${esc(P.prayerBeforeRosary[1])}</p><h4>${T("Apostles’ Creed","Symbolum Apostolorum")}</h4><p>${esc(P.apostlesCreed)}</p>
+  return `<p>${esc(P.prayerBeforeRosary[0])} <em style="color:var(--muted)">${req}</em> ${esc(P.prayerBeforeRosary[1])}</p>`;
+}
+function introHtml(P){
+  return `<h4>${T("Apostles’ Creed","Symbolum Apostolorum")}</h4><p>${esc(P.apostlesCreed)}</p>
     <h4>${T("Our Father","Pater Noster")}</h4><p>${esc(P.ourFather)}</p>
     ${[["faith","fidei"],["hope","spei"],["charity (love)","caritatis (amoris)"]].map(([en,la])=>`<h4>${T("Hail Mary","Ave Maria")} <span style="text-transform:none;letter-spacing:0;font-weight:400;color:var(--muted)">${T(`for an increase in ${en}`,`pro augmento ${la}`)}</span></h4><p>${esc(P.hailMary)}</p>`).join("")}
-    <h4>${T("Glory Be","Gloria Patri")}</h4><p>${esc(P.gloryBe)}</p>`;
+    <h4>${T("Glory Be","Gloria Patri")}</h4><p>${esc(P.gloryBe)}</p>
+    <h4>${T("Fatima Prayer","Oratio Fatimae")}</h4><p>${esc(P.fatima)}</p><h4>${T("Pardon Prayer","Oratio veniae")}</h4><p>${esc(P.pardonPrayer)}</p>`;
 }
 // shown at the very end, after the Prayer to Saint Joseph: the Rosary counts only when this button is pressed
 function doneBox(base){
@@ -1262,7 +1272,7 @@ function decades(ms){
     `Mysteria ${SET_LA[set]} (${ms.whyLa}). In singulis decadibus: enuntia mysterium, ora semel Pater Noster, decies Ave Maria, semel Gloria Patri, Orationem Fatimae et Orationem veniae. Tange + iuxta mysterium ut versum Scripturae ante singulas Ave Maria legas, et singula signa tange dum oras: manus orantes pro Pater Noster, rosam pro singulis Ave Maria, deinde Gloria Patri, Orationem Fatimae et Orationem veniae.`)}</p><ol>`;
   for(let k=1;k<=5;k++){
     const vs=MYSTERY_VERSES[set][k-1].map(([r,t],i)=>lang==="la"?[refLa(r),MYSTERY_VERSES_LA[set][k-1][i]]:[r,t]);
-    h+=`<li style="margin-bottom:6px"><details class="myst"><summary aria-label="${esc(names[k-1][0])}: ${T("show Scripture verses","versus Scripturae")}"><span><strong style="font-weight:600">${esc(names[k-1][0])}</strong><br><em style="color:var(--muted)">(${esc(names[k-1][1])})</em></span></summary><ol class="verses">${vs.map(([r,t])=>`<li>${esc(t)} <span class="ref">${esc(r)}</span></li>`).join("")}</ol></details>${hmRow(base+k)}</li>`;}
+    h+=`<li style="margin-bottom:6px"${(hmCounts()[base+k]||0)===DEC_N?' class="dec-done"':""}><details class="myst"><summary aria-label="${esc(names[k-1][0])}: ${T("show Scripture verses","versus Scripturae")}"><span><strong style="font-weight:600">${esc(names[k-1][0])}</strong><br><em style="color:var(--muted)">(${esc(names[k-1][1])})</em></span></summary><ol class="verses">${vs.map(([r,t])=>`<li>${esc(t)} <span class="ref">${esc(r)}</span></li>`).join("")}</ol></details>${hmRow(base+k)}</li>`;}
   h+=`</ol><details style="border:none"><summary style="font-size:15px;min-height:44px;font-family:var(--f-ui);font-weight:500;color:var(--marian)">${T("Show the decade prayers","Orationes decadis")}</summary>
     <h4>${T("Our Father","Pater Noster")}</h4><p>${esc(P.ourFather)}</p><h4>${T("Hail Mary ×10","Ave Maria ×10")}</h4><p>${esc(P.hailMary)}</p><h4>${T("Glory Be","Gloria Patri")}</h4><p>${esc(P.gloryBe)}</p><h4>${T("Fatima Prayer","Oratio Fatimae")}</h4><p>${esc(P.fatima)}</p><h4>${T("Pardon Prayer","Oratio veniae")}</h4><p>${esc(P.pardonPrayer)}</p></details>`;
   return h;
@@ -1298,21 +1308,38 @@ function drawPrayers(){
   else{const setLabel=k=>T(`${k} Mysteries`,`Mysteria ${SET_LA[k]}`)+(k===ms.sug?T(" (today)"," (hodie)"):"");
     top=`<div class="myst-pick"><label class="label" for="mysterySelect">${T("Mysteries to pray","Mysteria oranda")}</label>
     <select id="mysterySelect">${SETS.map(k=>`<option value="${k}"${k===ms.set?" selected":""}>${setLabel(k)}</option>`).join("")}</select></div>`}
-  const sec=(num,title,body,open)=>`<details${open?" open":""}><summary><span class="n">${num}</span>${title}</summary><div class="prayer">${body}</div></details>`;
+  const sec=(num,title,body,open,cls)=>`<details${open?" open":""}${cls?` class="${cls}"`:""}><summary><span class="n">${num}</span>${title}</summary><div class="prayer">${body}</div></details>`;
   let i=1,h=intent+top+sec(i++,T("Sign of the Cross","Signum Crucis"),para(P.signOfCross),true);
   const off=nov?novOfferings(prayCtx.day):null;
   if(nov)h+=sec(i++,T("Offering of the Crown of Roses","Oblatio coronae rosarum"),off.crown);
-  h+=sec(i++,T("Opening prayers","Orationes initiales"),openingPrayers(P));
-  h+=sec(i++,T(`The ${ms.set} Mysteries`,`Mysteria ${SET_LA[ms.set]}`),decades(ms),true);
-  h+=sec(i++,T("Closing prayers","Orationes conclusivae"),`<h4>${T("Hail, Holy Queen","Salve Regina")}</h4>${para(P.hailHolyQueen)}<h4>${T("Prayer after the Rosary","Oratio post Rosarium")}</h4>${para(P.prayerAfterRosary)}`);
+  h+=sec(i++,T("Prayer Before the Rosary","Oratio ante Rosarium"),beforeRosaryHtml(P));
+  h+=sec(i++,T("Introductory Prayers","Orationes introductoriae"),introHtml(P));
+  h+=sec(i++,T(`The ${ms.set} Mysteries`,`Mysteria ${SET_LA[ms.set]}`),decades(ms),true,"dec-sec");
+  h+=sec(i++,T("Hail, Holy Queen","Salve Regina"),para(P.hailHolyQueen));
+  h+=sec(i++,T("Prayer after the Rosary","Oratio post Rosarium"),para(P.prayerAfterRosary));
   if(nov)h+=sec(i++,T("Closing offering","Oblatio conclusiva"),off.close);
   h+=sec(i++,T("Prayer to Saint Joseph","Oratio ad Sanctum Ioseph"),P.stJoseph.map(t=>`<p class="lines">${esc(t).split("\n").map(l=>`<span>${l}</span>`).join("")}</p>`).join(""));
   h+=`<div id="doneSlot" style="margin-top:14px">${doneBox(rowBase(ms))}</div>`;
   $("prayBody").innerHTML=h;
+  applySecDone();
   bindAnother();
 }
+/* Opening a section yourself turns every section before it gold (kept for today only, per Rosary / novena day).
+   The decade section also turns gold as soon as all five decades are finished. */
+let secState={day:"",d:{}};try{secState=JSON.parse(localStorage.getItem(LS_KEY+"-sec")||"null")||secState}catch(e){}
+function secKey(){return prayCtx.kind==="nov"?`n:${curNov()?curNov().id:"x"}:${prayCtx.day}`:"d"}
+function secDone(){const t=new Date().toDateString();if(secState.day!==t)secState={day:t,d:{}};const k=secKey();return secState.d[k]||(secState.d[k]=[])}
+function applySecDone(){const done=secDone(),full=isComplete(rowBase(prayMs()));
+  [...$("prayBody").querySelectorAll(":scope > details")].forEach((d,i)=>d.classList.toggle("sec-done",done.includes(i+1)||(full&&d.classList.contains("dec-sec"))))}
+$("prayBody").addEventListener("click",e=>{
+  const sm=e.target.closest("summary");if(!sm)return;const d=sm.parentElement;
+  if(d.parentElement!==$("prayBody")||d.open)return;   // only when you open a section yourself
+  const idx=[...$("prayBody").querySelectorAll(":scope > details")].indexOf(d)+1;if(idx<2)return;
+  const done=secDone();let changed=false;for(let i=1;i<idx;i++)if(!done.includes(i)){done.push(i);changed=true}
+  if(changed){try{localStorage.setItem(LS_KEY+"-sec",JSON.stringify(secState))}catch(err){}applySecDone()}
+});
 function bindAnother(){const f=$("finishBtn");if(f)f.onclick=finishRosary;const b=$("anotherBtn");if(b)b.onclick=()=>{
-  const base=rowBase(prayMs()),c=hmCounts();for(let k=1;k<=5;k++)delete c[base+k];delete hmState.rec[base];hmSave();redrawKeepingPlace();
+  const base=rowBase(prayMs()),c=hmCounts();for(let k=1;k<=5;k++)delete c[base+k];delete hmState.rec[base];hmSave();secDone().length=0;try{localStorage.setItem(LS_KEY+"-sec",JSON.stringify(secState))}catch(err){}redrawKeepingPlace();
   const first=$("prayBody").querySelector(".hm-row");if(first)first.scrollIntoView({behavior:"smooth",block:"center"});toast(T("A fresh Rosary is ready","Novum Rosarium paratum est"))}}
 function redrawKeepingPlace(){
   const sh=$("prayOverlay").querySelector(".sheet"),y=sh.scrollTop,open=[...$("prayBody").querySelectorAll("details")].map(d=>d.open);
@@ -1350,7 +1377,7 @@ $("prayBody").addEventListener("click",e=>{
   const b=e.target.closest(".hm-rose");if(!b)return;e.preventDefault();
   const row=b.closest(".hm-row"),key=row.dataset.key,counts=hmCounts(),c=counts[key]||0,i=+b.dataset.i;
   const nc=(i===c-1)?c-1:Math.min(DEC_N,c+1);   // tap the newest icon to take it back; any other icon adds the next one
-  counts[key]=nc;hmSave();row.innerHTML=hmRowInner(key);row.setAttribute("aria-label",`${T("Prayers said","Orationes dictae")}: ${nc} / ${DEC_N}`);
+  counts[key]=nc;hmSave();row.innerHTML=hmRowInner(key);row.closest("li").classList.toggle("dec-done",nc===DEC_N);applySecDone();row.setAttribute("aria-label",`${T("Prayers said","Orationes dictae")}: ${nc} / ${DEC_N}`);
   if(nc===DEC_N){[...row.children].forEach((r,j)=>{r.classList.add("pop");r.querySelector("svg").style.animationDelay=(j*40)+"ms"});toast(isComplete(key.slice(0,-1))?T("All five decades prayed. Continue with the closing prayers.","Quinque decades dictae. Perge ad orationes conclusivas."):T("Decade complete","Decas completa"))}
   else if(nc>c){row.children[nc-1].classList.add("pop")}
   checkRosary();
