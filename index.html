@@ -426,7 +426,7 @@ li.dec-done::marker{color:var(--gold-text);font-weight:600}
     </div></div>
 
   <footer class="site-foot">
-    <span>Jacoby / Parden Web Apps 2026</span><span class="sep">-</span><span id="appVersion">v6</span><span class="sep">-</span><a href="https://venmo.com/James-Parden" target="_blank" rel="noopener">Donate</a><span class="sep">-</span><a href="mailto:jdparden@gmail.com?subject=Rose%20Garden%20of%20Mary" class="mail-link" aria-label="Email jdparden@gmail.com" title="Email jdparden@gmail.com"><svg width="18" height="14" viewBox="0 0 24 18" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round" stroke-linecap="round" aria-hidden="true"><rect x="1.5" y="1.5" width="21" height="15" rx="2.5"/><path d="M2.5 3l9.5 7 9.5-7"/></svg></a>
+    <span>Jacoby / Parden Web Apps 2026</span><span class="sep">-</span><span id="appVersion">v7</span><span class="sep">-</span><a href="https://venmo.com/James-Parden" target="_blank" rel="noopener">Donate</a><span class="sep">-</span><a href="mailto:jdparden@gmail.com?subject=Rose%20Garden%20of%20Mary" class="mail-link" aria-label="Email jdparden@gmail.com" title="Email jdparden@gmail.com"><svg width="18" height="14" viewBox="0 0 24 18" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round" stroke-linecap="round" aria-hidden="true"><rect x="1.5" y="1.5" width="21" height="15" rx="2.5"/><path d="M2.5 3l9.5 7 9.5-7"/></svg></a>
   </footer>
 </div>
 
@@ -714,7 +714,7 @@ const NOVENA = {
 };
 /* ===================== end of editable section ===================== */
 
-const APP_VERSION="6";
+const APP_VERSION="7";
 const REQUIRE_PIN=true; // the blank copy sets this to false: no PIN until you choose one
 const LS_KEY="rosegarden-data", THEME_KEY="rosegarden-theme", PIN_KEY="rosegarden-pin";
 const $=id=>document.getElementById(id);
@@ -1310,7 +1310,7 @@ function drawPrayers(){
   else{const setLabel=k=>T(`${k} Mysteries`,`Mysteria ${SET_LA[k]}`)+(k===ms.sug?T(" (today)"," (hodie)"):"");
     top=`<div class="myst-pick"><label class="label" for="mysterySelect">${T("Mysteries to pray","Mysteria oranda")}</label>
     <select id="mysterySelect">${SETS.map(k=>`<option value="${k}"${k===ms.set?" selected":""}>${setLabel(k)}</option>`).join("")}</select></div>`}
-  const sec=(num,title,body,open,cls)=>`<details${open?" open":""}${cls?` class="${cls}"`:""}><summary><span class="n">${num}</span>${title}</summary><div class="prayer">${body}</div></details>`;
+  const sec=(num,title,body,open,cls)=>`<details${cls?` class="${cls}"`:""}><summary><span class="n">${num}</span>${title}</summary><div class="prayer">${body}</div></details>`;
   let i=1,h=intent+top+sec(i++,T("Sign of the Cross","Signum Crucis"),para(P.signOfCross),true);
   const off=nov?novOfferings(prayCtx.day):null;
   if(nov)h+=sec(i++,T("Offering of the Crown of Roses","Oblatio coronae rosarum"),off.crown);
@@ -1347,8 +1347,8 @@ function resetRosaryProgress(base,secK){const c=hmCounts();for(let k=1;k<=5;k++)
 function resetDailyPrayers(){const c=hmCounts();for(const k in c)if(k.startsWith("d:"))delete c[k];for(const k in hmState.rec)if(k.startsWith("d:"))delete hmState.rec[k];
   hmSave();clearSecGold("d");mysteryChoice=null;if(!$("prayOverlay").hidden&&prayCtx.kind==="daily")drawPrayers()}
 function bindAnother(){const f=$("finishBtn");if(f)f.onclick=finishRosary;const b=$("anotherBtn");if(b)b.onclick=()=>{
-  const base=rowBase(prayMs()),c=hmCounts();for(let k=1;k<=5;k++)delete c[base+k];delete hmState.rec[base];hmSave();secDone().length=0;try{localStorage.setItem(LS_KEY+"-sec",JSON.stringify(secState))}catch(err){}redrawKeepingPlace();
-  const first=$("prayBody").querySelector(".hm-row");if(first)first.scrollIntoView({behavior:"smooth",block:"center"});toast(T("A fresh Rosary is ready","Novum Rosarium paratum est"))}}
+  const base=rowBase(prayMs()),c=hmCounts();for(let k=1;k<=5;k++)delete c[base+k];delete hmState.rec[base];hmSave();secDone().length=0;try{localStorage.setItem(LS_KEY+"-sec",JSON.stringify(secState))}catch(err){}drawPrayers();
+  $("prayOverlay").querySelector(".sheet").scrollTo({top:0,behavior:"smooth"});toast(T("A fresh Rosary is ready","Novum Rosarium paratum est"))}}
 function redrawKeepingPlace(){
   const sh=$("prayOverlay").querySelector(".sheet"),y=sh.scrollTop,open=[...$("prayBody").querySelectorAll("details")].map(d=>d.open);
   drawPrayers();[...$("prayBody").querySelectorAll("details")].forEach((d,i)=>{if(i<open.length)d.open=open[i]});sh.scrollTop=y;
