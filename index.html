@@ -426,7 +426,7 @@ li.dec-done::marker{color:var(--gold-text);font-weight:600}
     </div></div>
 
   <footer class="site-foot">
-    <span>Jacoby / Parden Web Apps 2026</span><span class="sep">-</span><span id="appVersion">v5</span><span class="sep">-</span><a href="https://venmo.com/James-Parden" target="_blank" rel="noopener">Donate</a><span class="sep">-</span><a href="mailto:jdparden@gmail.com?subject=Rose%20Garden%20of%20Mary" class="mail-link" aria-label="Email jdparden@gmail.com" title="Email jdparden@gmail.com"><svg width="18" height="14" viewBox="0 0 24 18" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round" stroke-linecap="round" aria-hidden="true"><rect x="1.5" y="1.5" width="21" height="15" rx="2.5"/><path d="M2.5 3l9.5 7 9.5-7"/></svg></a>
+    <span>Jacoby / Parden Web Apps 2026</span><span class="sep">-</span><span id="appVersion">v6</span><span class="sep">-</span><a href="https://venmo.com/James-Parden" target="_blank" rel="noopener">Donate</a><span class="sep">-</span><a href="mailto:jdparden@gmail.com?subject=Rose%20Garden%20of%20Mary" class="mail-link" aria-label="Email jdparden@gmail.com" title="Email jdparden@gmail.com"><svg width="18" height="14" viewBox="0 0 24 18" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round" stroke-linecap="round" aria-hidden="true"><rect x="1.5" y="1.5" width="21" height="15" rx="2.5"/><path d="M2.5 3l9.5 7 9.5-7"/></svg></a>
   </footer>
 </div>
 
@@ -714,7 +714,7 @@ const NOVENA = {
 };
 /* ===================== end of editable section ===================== */
 
-const APP_VERSION="5";
+const APP_VERSION="6";
 const REQUIRE_PIN=true; // the blank copy sets this to false: no PIN until you choose one
 const LS_KEY="rosegarden-data", THEME_KEY="rosegarden-theme", PIN_KEY="rosegarden-pin";
 const $=id=>document.getElementById(id);
@@ -753,8 +753,9 @@ function addRosary(o){
   const r={id:uidGen(),at,day:dk(at),set:o.set,lang:o.lang||"en",src:o.src||"mark"};
   state.rosaries.push(r);save();render();evalBadges(true);return r;
 }
-function removeRosary(id){state.rosaries=state.rosaries.filter(r=>r.id!==id);
-  for(const b in (hmState.rec||{}))if(hmState.rec[b]===id&&b.startsWith("d:"))resetRosaryProgress(b,"d");save();render();evalBadges(false)}
+function removeRosary(id,keepPrayers){const gone=state.rosaries.find(r=>r.id===id);state.rosaries=state.rosaries.filter(r=>r.id!==id);
+  // unmarking any of today's Rosaries (menu, calendar or buttons) puts today's prayers back to the start: no gold, no lit icons
+  if(gone&&!keepPrayers&&gone.day===todayK())resetDailyPrayers();save();render();evalBadges(false)}
 function stats(){
   const m=byDay(),days=Object.keys(m).sort(),t=todayK();
   let longest=0,run=0,prev=null;
@@ -1343,6 +1344,8 @@ function clearSecGold(k){if(secState.d)delete secState.d[k];try{localStorage.set
 // back to the original state: no lit icons, no gold, not counted
 function resetRosaryProgress(base,secK){const c=hmCounts();for(let k=1;k<=5;k++)delete c[base+k];delete hmState.rec[base];hmSave();clearSecGold(secK);
   if(!$("prayOverlay").hidden)redrawKeepingPlace()}
+function resetDailyPrayers(){const c=hmCounts();for(const k in c)if(k.startsWith("d:"))delete c[k];for(const k in hmState.rec)if(k.startsWith("d:"))delete hmState.rec[k];
+  hmSave();clearSecGold("d");mysteryChoice=null;if(!$("prayOverlay").hidden&&prayCtx.kind==="daily")drawPrayers()}
 function bindAnother(){const f=$("finishBtn");if(f)f.onclick=finishRosary;const b=$("anotherBtn");if(b)b.onclick=()=>{
   const base=rowBase(prayMs()),c=hmCounts();for(let k=1;k<=5;k++)delete c[base+k];delete hmState.rec[base];hmSave();secDone().length=0;try{localStorage.setItem(LS_KEY+"-sec",JSON.stringify(secState))}catch(err){}redrawKeepingPlace();
   const first=$("prayBody").querySelector(".hm-row");if(first)first.scrollIntoView({behavior:"smooth",block:"center"});toast(T("A fresh Rosary is ready","Novum Rosarium paratum est"))}}
@@ -1372,7 +1375,7 @@ function checkRosary(){
   const ms=prayMs(),base=rowBase(ms),full=isComplete(base),rec=hmState.rec[base];
   if(!full&&rec){
     if(prayCtx.kind==="nov"){const n=curNov(),d=prayCtx.day;if(n&&n.days[d-1]&&n.days[d-1]===rec){n.days[d-1]=null;n.completedAt=null;save();render();evalBadges(false);toast(T(`Day ${d} taken back`,`Dies ${d} revocatus`))}}
-    else if(state.rosaries.some(r=>r.id===rec)){delete hmState.rec[base];removeRosary(rec);toast(T("Rosary taken back","Rosarium revocatum"))}
+    else if(state.rosaries.some(r=>r.id===rec)){delete hmState.rec[base];removeRosary(rec,true);toast(T("Rosary taken back","Rosarium revocatum"))}
     delete hmState.rec[base];hmSave();clearSecGold(secKey());applySecDone();
   }
   $("doneSlot").innerHTML=doneBox(base);bindAnother();
