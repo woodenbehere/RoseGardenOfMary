@@ -348,6 +348,7 @@ textarea.notepad{min-height:224px;line-height:32px;padding:4px 12px;margin-top:6
 #prayBody > details.sec-done > .prayer,#prayBody > details.sec-done > .prayer :is(p,li,h4,strong,em,span,summary,ol){color:var(--gold-text)!important;transition:color .4s}
 li.dec-done details.myst > summary strong,li.dec-done details.myst > summary em{color:var(--gold-text)!important;transition:color .4s}
 li.dec-done::marker{color:var(--gold-text);font-weight:600}
+li.dec-done .verses,li.dec-done .verses li,li.dec-done .verses li::marker,li.dec-done .verses .ref{color:var(--gold-text)!important;transition:color .4s}
 @media (prefers-reduced-motion: reduce){*{animation:none!important;transition:none!important}}
 </style>
 
@@ -426,7 +427,7 @@ li.dec-done::marker{color:var(--gold-text);font-weight:600}
     </div></div>
 
   <footer class="site-foot">
-    <span>Jacoby / Parden Web Apps 2026</span><span class="sep">-</span><span id="appVersion">v7</span><span class="sep">-</span><a href="https://venmo.com/James-Parden" target="_blank" rel="noopener">Donate</a><span class="sep">-</span><a href="mailto:jdparden@gmail.com?subject=Rose%20Garden%20of%20Mary" class="mail-link" aria-label="Email jdparden@gmail.com" title="Email jdparden@gmail.com"><svg width="18" height="14" viewBox="0 0 24 18" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round" stroke-linecap="round" aria-hidden="true"><rect x="1.5" y="1.5" width="21" height="15" rx="2.5"/><path d="M2.5 3l9.5 7 9.5-7"/></svg></a>
+    <span>Jacoby / Parden Web Apps 2026</span><span class="sep">-</span><span id="appVersion">v8</span><span class="sep">-</span><a href="https://venmo.com/James-Parden" target="_blank" rel="noopener">Donate</a><span class="sep">-</span><a href="mailto:jdparden@gmail.com?subject=Rose%20Garden%20of%20Mary" class="mail-link" aria-label="Email jdparden@gmail.com" title="Email jdparden@gmail.com"><svg width="18" height="14" viewBox="0 0 24 18" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round" stroke-linecap="round" aria-hidden="true"><rect x="1.5" y="1.5" width="21" height="15" rx="2.5"/><path d="M2.5 3l9.5 7 9.5-7"/></svg></a>
   </footer>
 </div>
 
@@ -714,7 +715,7 @@ const NOVENA = {
 };
 /* ===================== end of editable section ===================== */
 
-const APP_VERSION="7";
+const APP_VERSION="8";
 const REQUIRE_PIN=true; // the blank copy sets this to false: no PIN until you choose one
 const LS_KEY="rosegarden-data", THEME_KEY="rosegarden-theme", PIN_KEY="rosegarden-pin";
 const $=id=>document.getElementById(id);
